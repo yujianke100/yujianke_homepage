@@ -22,7 +22,7 @@ featured: false
 awards:
   - name: "CCF-A"
     level: featured
-  - name: "中科院1区 Top"
+  - name: "CAS Zone 1 Top"
     level: featured
   - name: "JCR Q1"
     level: featured

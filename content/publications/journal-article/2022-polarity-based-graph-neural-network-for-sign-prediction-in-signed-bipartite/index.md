@@ -22,7 +22,7 @@ featured: false
 awards:
   - name: "CCF-B"
     level: featured
-  - name: "中科院4区"
+  - name: "CAS Zone 4"
     level: featured
   - name: "JCR Q2"
     level: featured

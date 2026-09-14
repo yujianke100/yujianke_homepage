@@ -265,14 +265,14 @@ def reconstruct_abstract(inverted: dict | None) -> str:
 
 
 def badges_for(venue_meta: dict) -> list[str]:
-    """场馆等级 -> 徽章文案。会议只有 CCF，期刊再加中科院分区与 JCR 四分位。"""
+    """场馆等级 -> 徽章文案（英文站点，故徽章名也用英文）。会议只有 CCF，期刊再加 CAS 分区与 JCR 四分位。"""
     badges = []
     if venue_meta.get("ccf"):
         badges.append(f"CCF-{venue_meta['ccf']}")
     if venue_meta.get("kind") != "conference":
         if venue_meta.get("cas"):
             top = " Top" if venue_meta.get("cas_top") else ""
-            badges.append(f"中科院{venue_meta['cas']}区{top}")
+            badges.append(f"CAS Zone {venue_meta['cas']}{top}")
         if venue_meta.get("jcr"):
             badges.append(f"JCR {venue_meta['jcr']}")
     return badges

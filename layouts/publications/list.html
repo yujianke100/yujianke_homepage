@@ -22,11 +22,11 @@
   {{ end }}
 
   <p class="mt-5 text-sm text-gray-500 dark:text-gray-400">
-    共 <strong class="text-gray-900 dark:text-gray-100">{{ $total }}</strong> 篇 ·
-    一作 <strong class="text-gray-900 dark:text-gray-100">{{ len $firstAuthor }}</strong> 篇 ·
-    CCF-A <strong class="text-gray-900 dark:text-gray-100">{{ $ccfA }}</strong> 篇
+    Total <strong class="text-gray-900 dark:text-gray-100">{{ $total }}</strong> papers ·
+    <strong class="text-gray-900 dark:text-gray-100">{{ len $firstAuthor }}</strong> first-author ·
+    <strong class="text-gray-900 dark:text-gray-100">{{ $ccfA }}</strong> CCF-A
     <span class="mx-2">|</span>
-    <a class="underline hover:text-primary-600" href="/#publications">返回首页精选</a>
+    <a class="underline hover:text-primary-600" href="/#publications">Back to selected publications</a>
   </p>
 
   <div class="mt-10 space-y-12">
@@ -35,7 +35,7 @@
         <h2 class="flex items-center gap-3 text-2xl font-bold text-gray-900 dark:text-white">
           <span>{{ .Key }}</span>
           <span class="h-px flex-1 bg-gray-200 dark:bg-gray-700"></span>
-          <span class="text-sm font-normal text-gray-400">{{ len .Pages }} 篇</span>
+          <span class="text-sm font-normal text-gray-400">{{ len .Pages }} papers</span>
         </h2>
 
         <ol class="mt-6 space-y-6 pl-0 list-none">
@@ -62,7 +62,7 @@
                 {{ with .Params.author_position }}
                   {{ if eq . 1 }}
                     <span class="inline-flex items-center rounded-full bg-gray-900 px-2 py-0.5 text-[11px] font-semibold text-white dark:bg-gray-100 dark:text-gray-900"
-                          title="第一作者">第一作者</span>
+                          title="First author">First author</span>
                   {{ end }}
                 {{ end }}
 
