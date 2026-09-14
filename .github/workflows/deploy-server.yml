@@ -1,0 +1,97 @@
+name: Build & deploy to server (jianke-yu.online)
+
+# 拓扑与旧站一致：GitHub Actions 负责构建（服务器 CPU 弱，不参与构建），
+# 只把构建好的静态文件打包上传到 upload.jianke-yu.online，由服务器上的
+# 脚本解包到 webroot。Hugo 版本从 hugoblox.yaml 读取。
+#
+# 目标目录：
+#   preview → 预览子目录（默认，不碰正式站）
+#   live    → 正式站根目录（预览验收通过后再用）
+#
+# 预览验证通过后，取消下面 push 触发的注释即可实现"推送即上线"。
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "部署目标"
+        required: true
+        type: choice
+        options: [preview, live]
+        default: preview
+  # push:
+  #   branches: ['main']
+
+permissions:
+  contents: read
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      DEPLOY_HOST: upload.jianke-yu.online
+      DEPLOY_PORT: "10198"
+      DEPLOY_USER: homepage
+      DEPLOY_DIR: /home/homepage
+      HUGO_VERSION: "0.162.0"
+      NODE_VERSION: "22"
+      TARGET: ${{ inputs.target || 'preview' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # Hugo .GitInfo / .Lastmod 需要完整历史
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        if: hashFiles('package.json') != ''
+        uses: pnpm/action-setup@v4
+
+      - name: Install JS deps (Tailwind / Pagefind)
+        if: hashFiles('package.json') != ''
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Setup Hugo (extended)
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: ${{ env.HUGO_VERSION }}
+          extended: true
+
+      - name: Build site
+        run: |
+          if [ "$TARGET" = "live" ]; then
+            BASE_URL="https://jianke-yu.online/"
+          else
+            BASE_URL="https://jianke-yu.online/preview/"
+          fi
+          echo "BASE_URL=$BASE_URL"
+          hugo --minify --baseURL "$BASE_URL"
+          if [ -f package.json ] && grep -q pagefind package.json; then
+            pnpm run pagefind || npx pagefind --site public
+          fi
+
+      - name: Pack static files
+        run: |
+          ls -la public | head -20
+          tar -czf site.tar.gz -C public .
+
+      - name: Upload to server and activate
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          if [ -z "$SSH_PRIVATE_KEY" ]; then
+            echo "::error::缺少 secret SSH_PRIVATE_KEY（与旧仓库同一个部署私钥）"
+            exit 1
+          fi
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -p "$DEPLOY_PORT" -t rsa "$DEPLOY_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          scp -P "$DEPLOY_PORT" site.tar.gz "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_DIR/"
+          ssh -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" \
+            "TARGET=$TARGET DEPLOY_DIR=$DEPLOY_DIR ~/deploy_homepage.sh"

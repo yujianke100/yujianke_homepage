@@ -1,10 +1,8 @@
 name: Deploy website to GitHub Pages
 
 on:
-  # Trigger the workflow every time you push to the `main` branch
-  push:
-    branches: ['main']
-  # Allows you to run this workflow manually from the Actions tab on GitHub
+  # 只保留手动触发：本站正式托管在自己的服务器上（见 deploy-server.yml），
+  # GitHub Pages 仅作为可选的临时预览。需要用预览时在 Actions 里手动 Run。
   workflow_dispatch:
 
 # Provide permission to clone the repo and deploy it to GitHub Pages
