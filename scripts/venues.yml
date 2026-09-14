@@ -1,81 +1,124 @@
-# ══════════════════════════════════════════════════════════════════════════════
-# 期刊/会议等级映射表（人工维护，同步管线读取）
-# 数据口径：CCF 推荐目录 2026 / 中科院分区表 2025（升级版）/ JCR 2025
-# 说明：cas(Top) = 中科院大类分区；jcr = JCR 分区；null 表示暂无/待核
-# 新增论文的 venue 若不在表内，管线会跳过徽章并在日志中提示补录
-# ══════════════════════════════════════════════════════════════════════════════
+# 论文页徽章（CCF / 中科院分区 / JCR）的唯一数据源
+#
+# ccf : CCF 2026 推荐国际学术会议和期刊目录等级 —— 已在 2026-09-14 逐条核对
+#       （来源：ccf.atom.im 全量目录，386 个会议 + 295 个期刊，按名称匹配）
+# cas : 中科院分区（升级版 2025）—— null = 尚未回填（需 ShowJCR 数据集的原始 CSV）
+# jcr : JCR 分区（2025）—— null = 尚未回填
+#
+# 只填有据可查的值；不确定的一律留 null（徽章宁缺毋错）。
+meta:
+  ccf_source: "CCF 2026 推荐目录（ccf.atom.im 全量核对，2026-09-14）"
+  ccf_extra_check: "World Wide Web 期刊 = CCF-B（ccf.atom.im 期刊表 + myhuiban 两处一致）"
+  cas_source: null
+  jcr_source: null
 
+# 规范场馆名 -> 等级。解析顺序：精确匹配 > aliases 正则 > 子串匹配
 venues:
-  # ----- 期刊（CCF 已核实 2026 版；中科院/JCR 待用数据集回填）-----
+  # ---------- 期刊 ----------
   "IEEE Transactions on Knowledge and Data Engineering":
     abbr: TKDE
+    kind: journal
     ccf: A
-    cas: null      # 待回填（预期 计算机科学 1区）
-    jcr: null
-    type: journal
-
-  "Information Sciences":
-    abbr: Inf. Sci.
-    ccf: B
-    cas: null      # 待回填（预期 计算机科学 1区）
-    jcr: null
-    type: journal
-
-  "World Wide Web":
-    abbr: WWWJ
-    ccf: null      # 2026 目录未收录，待核（历史版本为 B）
-    cas: null
-    jcr: null
-    type: journal
-
-  "Data Science and Engineering":
-    abbr: DSE
-    ccf: B
-    cas: null
-    jcr: null
-    type: journal
-
   "Proceedings of the ACM on Management of Data":
     abbr: PACMMOD
-    ccf: A        # 对应 SIGMOD 系（2026 目录：SIGMOD Conference = A 会议）
-    cas: null
-    jcr: null
-    type: journal
+    kind: journal
+    ccf: A
+  "Data Science and Engineering":
+    abbr: DSE
+    kind: journal
+    ccf: B
+  "Information Sciences":
+    abbr: Inf. Sci.
+    kind: journal
+    ccf: B
+  "World Wide Web":
+    abbr: WWWJ
+    kind: journal
+    ccf: B
+    note: "Springer，ISSN 1386-145X；IF≈3.4"
 
-  # ----- 会议 -----
+  # ---------- 会议 ----------
   "ACM SIGKDD Conference on Knowledge Discovery and Data Mining":
     abbr: KDD
+    kind: conference
     ccf: A
-    cas: null
-    jcr: null
-    type: conference
-
-  "ACM SIGMOD Conference":
-    abbr: SIGMOD
+  "IEEE International Conference on Data Engineering":
+    abbr: ICDE
+    kind: conference
     ccf: A
-    type: conference
-
+  "The Web Conference":
+    abbr: WWW
+    kind: conference
+    ccf: A
   "International Conference on Database Systems for Advanced Applications":
     abbr: DASFAA
+    kind: conference
     ccf: B
-    type: conference
-
-  "Pacific-Asia Conference on Knowledge Discovery and Data Mining":
-    abbr: PAKDD
-    ccf: C
-    type: conference
-
   "International Conference on Advanced Data Mining and Applications":
     abbr: ADMA
+    kind: conference
     ccf: C
-    type: conference
-
+  "Pacific-Asia Conference on Knowledge Discovery and Data Mining":
+    abbr: PAKDD
+    kind: conference
+    ccf: C
+  "Asia Pacific Web Conference (APWeb-WAIM)":
+    abbr: APWeb-WAIM
+    kind: conference
+    ccf: C
   "IEEE International Conference on High Performance Computing and Communications":
     abbr: HPCC
+    kind: conference
     ccf: C
-    type: conference
 
-  "Asia Pacific Web Conference":
-    abbr: APWeb
-    ccf: C
-    type: conference
+  # ---------- 未列入 CCF 目录（有据可查：目录全量检索无此条） ----------
+  "Australasian Database Conference":
+    abbr: ADC
+    kind: conference
+    ccf: null
+  "FLINS-ISKE":
+    abbr: FLINS-ISKE
+    kind: conference
+    ccf: null
+    note: "17th International FLINS Conference + 21st ISKE，LNCS 出版，2026 Sydney"
+
+  # ---------- 预印本 ----------
+  "arXiv":
+    abbr: arXiv
+    kind: preprint
+    ccf: null
+
+# 原始字符串（OpenAlex 的 source 名 / Crossref 的 container-title 与 event 名）
+# -> 规范场馆名。**顺序敏感**：先出现的规则优先（会议规则要放在同名期刊前面）
+aliases:
+  # ⚠ 顺序敏感：具体规则在前，泛化规则在后
+  - pattern: "SIGKDD|Proceedings of the \\d+(st|nd|rd|th) ACM SIGKDD"
+    venue: "ACM SIGKDD Conference on Knowledge Discovery and Data Mining"
+  - pattern: "International Conference on Data Engineering"
+    venue: "IEEE International Conference on Data Engineering"
+  - pattern: "The Web Conference|International World Wide Web Conference"
+    venue: "The Web Conference"
+  - pattern: "Advanced Data Mining and Applications"
+    venue: "International Conference on Advanced Data Mining and Applications"
+  - pattern: "Advances in Knowledge Discovery and Data Mining|Pacific-Asia Conference on Knowledge Discovery"
+    venue: "Pacific-Asia Conference on Knowledge Discovery and Data Mining"
+  - pattern: "Web and Big Data"
+    venue: "Asia Pacific Web Conference (APWeb-WAIM)"
+  - pattern: "Databases Theory and Applications"
+    venue: "Australasian Database Conference"
+  - pattern: "Machine Learning and Knowledge Engineering"
+    venue: "FLINS-ISKE"
+  - pattern: "High Performance Computing.{0,20}Communications|HPCC"
+    venue: "IEEE International Conference on High Performance Computing and Communications"
+  - pattern: "Knowledge and Data Engineering"
+    venue: "IEEE Transactions on Knowledge and Data Engineering"
+  - pattern: "Proceedings of the ACM on Management of Data|PACMMOD"
+    venue: "Proceedings of the ACM on Management of Data"
+  - pattern: "^Data Science and Engineering"
+    venue: "Data Science and Engineering"
+  - pattern: "^Information Sciences"
+    venue: "Information Sciences"
+  - pattern: "^World Wide Web"
+    venue: "World Wide Web"
+  - pattern: "arXiv|Cornell University|CoRR"
+    venue: "arXiv"
