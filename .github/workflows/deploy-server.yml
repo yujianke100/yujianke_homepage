@@ -89,18 +89,23 @@ jobs:
           hugo-version: ${{ env.HUGO_VERSION }}
           extended: true
 
-      - name: Resolve deploy target (手动输入 > 仓库 .deploy-target 文件 > preview)
+      - name: Resolve deploy target (手动输入 > 仓库 .deploy-target 文件 > 默认 preview)
         id: target
         run: |
-          FILE_TARGET=$(tr -d '[:space:]' < .deploy-target 2>/dev/null || echo "")
-          TARGET="${{ inputs.target }}"
-          if [ -z "$TARGET" ]; then TARGET="${FILE_TARGET:-preview}"; fi
+          set -u
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            INPUT_TARGET="${{ github.event.inputs.target }}"
+          else
+            INPUT_TARGET=""
+          fi
+          FILE_TARGET="$(tr -d '[:space:]' < .deploy-target 2>/dev/null || true)"
+          TARGET="${INPUT_TARGET:-${FILE_TARGET:-preview}}"
           case "$TARGET" in
             live|preview) ;;
-            *) echo "::error::非法部署目标: $TARGET"; exit 1 ;;
+            *) echo "::warning::未知目标 '$TARGET'，回退为 preview"; TARGET=preview ;;
           esac
           echo "TARGET=$TARGET" >> "$GITHUB_ENV"
-          echo "部署目标 = $TARGET（输入=${{ inputs.target }}，文件=$FILE_TARGET）"
+          echo "部署目标 = $TARGET（手动输入='${INPUT_TARGET}'，仓库文件='${FILE_TARGET}'，事件=${GITHUB_EVENT_NAME}）"
 
       - name: Build site
         timeout-minutes: 12
