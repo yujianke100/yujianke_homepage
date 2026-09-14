@@ -134,11 +134,13 @@ jobs:
         id: pack
         run: |
           if [ "$TARGET" = "live" ]; then
-            tar -czf homepage.tar.gz -C public .
+            PKG=homepage.tar.gz
           else
-            tar -czf homepage_preview.tar.gz -C public .
+            PKG=homepage_preview.tar.gz
           fi
-          ls -lh homepage_*.tar.gz
+          tar -czf "$PKG" -C public .
+          ls -lh "$PKG"
+          echo "打包完成: $PKG ($(du -h "$PKG" | cut -f1))"
 
       - name: Upload to server and activate
         id: deploy
@@ -161,7 +163,7 @@ jobs:
             scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=accept-new -P "$DEPLOY_PORT" homepage_preview.tar.gz "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_DIR/" 2>&1 | tee /tmp/deploy.log
             ssh -i ~/.ssh/id_rsa -p "$DEPLOY_PORT" -o StrictHostKeyChecking=accept-new "$DEPLOY_USER@$DEPLOY_HOST" "~/deploy_preview.sh" 2>&1 | tee -a /tmp/deploy.log
           fi
-          ssh -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "curl -s -o /dev/null -w 'preview_http=%{http_code}\n' https://jianke-yu.online/preview/ || true" 2>&1 | tee -a /tmp/deploy.log
+          ssh -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "if [ \"$TARGET\" = live ]; then U=https://jianke-yu.online/; else U=https://jianke-yu.online/preview/; fi; curl -s -o /dev/null -w \"self_check_http=%{http_code} ($U)\n\" \"$U\" || true" 2>&1 | tee -a /tmp/deploy.log
 
       - name: Publish diagnostics to ci-logs branch (匿名可读，便于排查)
         if: always()
