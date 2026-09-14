@@ -22,12 +22,13 @@ featured: false
 awards:
   - name: "CCF-B"
     level: featured
+  - name: "中科院4区"
+    level: featured
+  - name: "JCR Q2"
+    level: featured
 hugoblox:
   ids:
     doi: 10.1007/s11280-022-01015-4
-links:
-  - type: doi
-    url: https://doi.org/10.1007/s11280-022-01015-4
 abstract: "Abstract As a fundamental data structure, graphs are ubiquitous in various applications. Among all types of graphs, signed bipartite graphs contain complex structures with positive and negative links as well as bipartite settings, on which conventional graph analysis algorithms are no longer applicable. Previous works mainly focus on unipartite signed graphs or unsigned bipartite graphs separately. Several models are proposed for applications on the signed bipartite graphs by utilizing the heuristic structural information. However, these methods have limited capability to fully capture the information hidden in such graphs. In this paper, we propose the first graph neural network on signed bipartite graphs, namely Polarity-based Graph Convolutional Network (PbGCN), for sign prediction task with the help of balance theory. We introduce the novel polarity attribute to signed bipartite graphs, based on which we construct one-mode projection graphs to allow the GNNs to aggregate information between the same type nodes. Extensive experiments on five datasets demonstrate the effectiveness of our proposed techniques."
 summary: "Abstract As a fundamental data structure, graphs are ubiquitous in various applications. Among all types of graphs, signed bipartite graphs contain complex structures with positive and negative links as well as bipartite settings, on which conventional graph analysis algorithms are no longer applicable."
 projects: []

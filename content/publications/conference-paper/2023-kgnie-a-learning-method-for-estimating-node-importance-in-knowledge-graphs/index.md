@@ -25,9 +25,6 @@ awards:
 hugoblox:
   ids:
     doi: 10.1109/hpcc-dss-smartcity-dependsys60770.2023.00089
-links:
-  - type: doi
-    url: https://doi.org/10.1109/hpcc-dss-smartcity-dependsys60770.2023.00089
 abstract: "Estimating node importance is critical in graph data mining, benefiting various downstream applications such as social network analysis and recommendation systems. Existing approaches face challenges when dealing with complex knowledge graphs due to the abundance of predicate and entity information. This paper introduces KGNIE, an efficient knowledge graph node importance estimation network. KGNIE considers the rich predicate attributes and entity types, and utilizes local and global information encoders to generate node embeddings with different importance-related information. An attention-based fusion module is employed to balance the two encoders. A node importance decoder is proposed to map node embed dings to importance scores based on entity types. Furthermore, we introduce a margin ranking loss to determine relative node importance rankings. We conducted extensive experiments on real-world knowledge graphs, demonstrating that our model outperforms existing approaches across all evaluation metrics."
 summary: "Estimating node importance is critical in graph data mining, benefiting various downstream applications such as social network analysis and recommendation systems. Existing approaches face challenges when dealing with complex knowledge graphs due to the abundance of predicate and entity information."
 projects: []

@@ -104,6 +104,47 @@ def load_config() -> tuple[dict, list[tuple[re.Pattern, str]]]:
     return venues, aliases
 
 
+def load_extras() -> list[dict]:
+    """手工补充论文（已被接收但 OpenAlex 尚未收录者），转成与 OpenAlex 相同的结构。"""
+    path = ROOT / "scripts" / "extra_publications.yml"
+    if not path.exists():
+        return []
+    data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    works = []
+    for e in data.get("papers") or []:
+        venue = e.get("venue", "")
+        # 走 venues.yml 判定类型：会议/期刊/预印本
+        vmeta = {}
+        try:
+            venues, aliases = load_config()
+            vmeta = venues.get(resolve_venue(venue, venues, aliases), {})
+        except Exception:
+            pass
+        is_conf = vmeta.get("kind") == "conference" or "conference" in venue.lower()
+        year = e.get("year")
+        raw_date = e.get("date")
+        # YAML 会把 2026-09-13 解析成 datetime.date，统一成字符串（否则与 OpenAlex 的字符串混排会崩）
+        date_str = raw_date.isoformat() if hasattr(raw_date, "isoformat") else (str(raw_date) if raw_date else "")
+        works.append({
+            "title": e["title"],
+            "publication_year": year,
+            "publication_date": date_str or (f"{year}-01-01" if year else ""),
+            "type": "conference-paper" if is_conf else "article",
+            "authorships": [{"author": {"display_name": ("Jianke Yu" if a == "me" else a)}}
+                            for a in (e.get("authors") or [])],
+            "primary_location": {"source": {"display_name": venue,
+                                            "type": "conference" if is_conf else "journal"}},
+            "locations": [],
+            "ids": {},
+            "doi": f"https://doi.org/{e['doi']}" if e.get("doi") else None,
+            "cited_by_count": e.get("cited_by", 0),
+            "open_access": {"is_oa": False},
+            "abstract_inverted_index": None,
+            "_extra": True,
+        })
+    return works
+
+
 def resolve_venue(name: str, venues: dict, aliases: list[tuple[re.Pattern, str]]) -> str:
     """Map a raw venue string to a canonical venues.yml key ('' if unmappable)."""
     if not name:
@@ -266,6 +307,10 @@ def build_page(work: dict, venues: dict, aliases, cache: dict) -> tuple[pathlib.
     lines = [
         "---",
         f"# ⚠️ {GENERATED_MARK} — do not edit by hand.",
+    ]
+    if work.get("_extra"):
+        lines.append("# 来源: scripts/extra_publications.yml（已接收/发表但 OpenAlex 尚未收录，手工补充）")
+    lines += [
         f"title: {json.dumps(title, ensure_ascii=False)}",
         "authors:",
         yaml_list(authors),
@@ -287,11 +332,8 @@ def build_page(work: dict, venues: dict, aliases, cache: dict) -> tuple[pathlib.
             lines += [f"  - name: {json.dumps(b, ensure_ascii=False)}", "    level: featured"]
     ids = ([("doi", doi)] if doi else []) + ([("arxiv", arxiv)] if arxiv else [])
     if ids:
+        # 只写 hugoblox.ids：主题会据此自动生成链接（再写 links 会重复出两个 DOI 按钮）
         lines += ["hugoblox:", "  ids:"] + [f"    {k}: {v}" for k, v in ids]
-        lines.append("links:")
-        for k, v in ids:
-            url = f"https://doi.org/{v}" if k == "doi" else f"https://arxiv.org/abs/{v}"
-            lines += [f"  - type: {'doi' if k == 'doi' else 'preprint'}", f"    url: {url}"]
     if abstract:
         lines.append(f"abstract: {json.dumps(abstract[:1800], ensure_ascii=False)}")
         lines.append("summary: " + json.dumps(" ".join(re.split(r"(?<=[.!?])\s+", abstract)[:2])[:400],
@@ -342,6 +384,20 @@ def main() -> int:
             if rank >= best[key][0]:
                 continue
         best[key] = (rank, w)
+
+    # 手工补充（已被接收但 OpenAlex 尚未收录）：OpenAlex 已收录同名论文时不重复列出
+    extras = load_extras()
+    extra_added = 0
+    for w in extras:
+        key = norm_title(clean(w.get("title") or ""))
+        if key in best:
+            skipped.append((clean(w.get("title") or ""), "已由 OpenAlex 收录，忽略手工补充"))
+            continue
+        best[key] = ((0, 0), w)
+        extra_added += 1
+    if extras:
+        print(f"手工补充: {len(extras)} 篇，实际新增 {extra_added} 篇")
+
     entries = sorted((w for _, w in best.values()),
                      key=lambda w: (w.get("publication_date") or ""), reverse=True)
 

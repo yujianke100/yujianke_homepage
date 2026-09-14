@@ -25,9 +25,6 @@ awards:
 hugoblox:
   ids:
     doi: 10.1007/978-981-97-7238-4_6
-links:
-  - type: doi
-    url: https://doi.org/10.1007/978-981-97-7238-4_6
 projects: []
 slides: ""
 ---

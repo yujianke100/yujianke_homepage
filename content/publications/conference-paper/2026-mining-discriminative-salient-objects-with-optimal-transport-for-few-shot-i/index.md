@@ -22,9 +22,6 @@ featured: false
 hugoblox:
   ids:
     doi: 10.1007/978-981-92-2487-6_25
-links:
-  - type: doi
-    url: https://doi.org/10.1007/978-981-92-2487-6_25
 projects: []
 slides: ""
 ---

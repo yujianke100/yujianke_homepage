@@ -22,12 +22,13 @@ featured: false
 awards:
   - name: "CCF-B"
     level: featured
+  - name: "中科院4区"
+    level: featured
+  - name: "JCR Q2"
+    level: featured
 hugoblox:
   ids:
     doi: 10.1007/s11280-022-01009-2
-links:
-  - type: doi
-    url: https://doi.org/10.1007/s11280-022-01009-2
 abstract: "Abstract Graphs have been widely adopted in various fields, where many graph models are developed. Most of previous research focuses on unipartite or homogeneous graph analysis. In this graphs, the relationships between the same type of entities are preserved in the graphs. Meanwhile, the bipartite graphs that model the complex relationships among different entities with vertices partitioned into two disjoint sets, are becoming increasing popular and ubiquitous in many real life applications. Though several graph classification methods on unipartite and homogenous graphs have been proposed by using kernel method, graph neural network, etc. However, these methods are unable to effectively capture the hidden information in bipartite graphs. In this paper, we propose the first bipartite graph-based capsule network, namely Bipartite Capsule Graph Neural Network (BCGNN), for the bipartite graph classification task. BCGNN exploits the capsule network and obtains information between the same type vertices in the bipartite graphs by constructing the one-mode projection. Extensive experiments are conducted on real-world datasets to demonstrate the effectiveness of our proposed method."
 summary: "Abstract Graphs have been widely adopted in various fields, where many graph models are developed. Most of previous research focuses on unipartite or homogeneous graph analysis."
 projects: []

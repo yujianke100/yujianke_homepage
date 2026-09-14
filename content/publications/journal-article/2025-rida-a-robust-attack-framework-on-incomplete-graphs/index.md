@@ -24,15 +24,14 @@ featured: false
 awards:
   - name: "CCF-B"
     level: featured
+  - name: "中科院4区"
+    level: featured
+  - name: "JCR Q2"
+    level: featured
 hugoblox:
   ids:
     doi: 10.1007/s11280-025-01354-y
     arxiv: https://doi.org/10.48550/arxiv.2407.18170
-links:
-  - type: doi
-    url: https://doi.org/10.1007/s11280-025-01354-y
-  - type: preprint
-    url: https://arxiv.org/abs/https://doi.org/10.48550/arxiv.2407.18170
 projects: []
 slides: ""
 ---

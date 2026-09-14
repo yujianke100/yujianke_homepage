@@ -25,12 +25,13 @@ featured: true
 awards:
   - name: "CCF-A"
     level: featured
+  - name: "中科院1区 Top"
+    level: featured
+  - name: "JCR Q1"
+    level: featured
 hugoblox:
   ids:
     doi: 10.1109/tkde.2024.3485127
-links:
-  - type: doi
-    url: https://doi.org/10.1109/tkde.2024.3485127
 abstract: "Along with the rapid technological and commercial innovation on e-commerce platforms, an increasing number of frauds cause great harm to these platforms. Many frauds are conducted by organized groups of fraudsters for higher efficiency and lower costs, also known as group-based frauds. Despite the high concealment and strong destructiveness of group-based fraud, no existing research can thoroughly exploit the information within the transaction networks of e-commerce platforms for group-based fraud detection. In this work, we analyze and summarize the characteristics of group-based frauds. Based on this, we propose a novel end-to-end semi-supervised Group-based Fraud Detection Network (GFDN) to support such fraud detection in real-world applications. In addition, we introduce a module namedTemporal Group Dynamics Analyzer(TGDA) that strengthens the ability to analyze temporal information on group fraudulent activity. Based on this, we built an enhanced model named TGFDN. Experimental results on large-scale e-commerce datasets from Taobao and Bitcoin trading datasets show our proposed model's superior effectiveness and efficiency for group-based fraud detection on bipartite graphs."
 summary: "Along with the rapid technological and commercial innovation on e-commerce platforms, an increasing number of frauds cause great harm to these platforms. Many frauds are conducted by organized groups of fraudsters for higher efficiency and lower costs, also known as group-based frauds."
 projects: []

@@ -22,12 +22,13 @@ featured: false
 awards:
   - name: "CCF-B"
     level: featured
+  - name: "中科院4区"
+    level: featured
+  - name: "JCR Q2"
+    level: featured
 hugoblox:
   ids:
     doi: 10.1007/s11280-023-01205-8
-links:
-  - type: doi
-    url: https://doi.org/10.1007/s11280-023-01205-8
 abstract: "Abstract In recent years, how to prevent the widespread transmission of infectious diseases in communities has been a research hot spot. Tracing close contact with infected individuals is one of the most severe problems. In this work, we present a model called Follower Prediction Graph Network (FPGN) to identify high-risk visitors, which is known as follower prediction. The model is designed to identify visitors who may be infected with a disease by tracking their activities at the exact location of infected visitors. FPGN is inspired by the state-of-the-art temporal graph edge prediction algorithm TGN and draws on the shortcomings of existing algorithms. It utilizes graph structure information based on ( $$\\alpha $$ α , $$\\beta $$ β )-core, time interval statistics by using the statistics of timestamp information, and a GAT-based prediction module to achieve high accuracy in follower prediction. Extensive experiments are conducted on two real datasets, demonstrating the progress of FPGN. The experimental results show that FPGN can achieve the highest results compared with other SOTA baselines. Its AP scores are higher than 0.46, and its AUC scores are higher than 0.62."
 summary: "Abstract In recent years, how to prevent the widespread transmission of infectious diseases in communities has been a research hot spot. Tracing close contact with infected individuals is one of the most severe problems."
 projects: []

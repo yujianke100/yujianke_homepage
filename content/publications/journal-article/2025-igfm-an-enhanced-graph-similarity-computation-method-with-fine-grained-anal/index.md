@@ -22,12 +22,13 @@ featured: false
 awards:
   - name: "CCF-B"
     level: featured
+  - name: "中科院1区 Top"
+    level: featured
+  - name: "JCR Q2"
+    level: featured
 hugoblox:
   ids:
     doi: 10.1007/s41019-024-00278-3
-links:
-  - type: doi
-    url: https://doi.org/10.1007/s41019-024-00278-3
 abstract: "Abstract In the rapidly advancing field of graph-based applications, accurate graph similarity computing (GSC) has become increasingly important. However, due to the complexity of graph structures, this task remains a challenge because of the intricate calculations involved. To solve the limitations of existing works, this paper introduces the Interpretable Graph Fusion Model (), a novel framework designed to enhance the accuracy and efficiency of graph similarity computation. Specifically, our model can fully utilize graph structure information and comprehensively assess graph similarity at both fine-grained and coarse-grained levels, ultimately achieving more accurate predictions. Experimented extensively across four real-world datasets, demonstrates a significant improvement over existing SOTA methods to solve the GSC challenge. In numerous experimental tests, our model shows performance improvements in terms of MSE (Mean Squared Error), ranging from 4.66% to as much as 56.92% compared to the second-best method."
 summary: "Abstract In the rapidly advancing field of graph-based applications, accurate graph similarity computing (GSC) has become increasingly important. However, due to the complexity of graph structures, this task remains a challenge because of the intricate calculations involved."
 projects: []

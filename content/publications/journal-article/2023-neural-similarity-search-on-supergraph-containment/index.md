@@ -22,12 +22,13 @@ featured: false
 awards:
   - name: "CCF-A"
     level: featured
+  - name: "中科院1区 Top"
+    level: featured
+  - name: "JCR Q1"
+    level: featured
 hugoblox:
   ids:
     doi: 10.1109/tkde.2023.3279920
-links:
-  - type: doi
-    url: https://doi.org/10.1109/tkde.2023.3279920
 abstract: "Supergraph search is a fundamental graph query processing problem. Supergraph search aims to find all data graphs contained in a given query graph based on the subgraph isomorphism. Existing algorithms construct the indices and adopt thefiltering-and-verificationframework which is usually computationally expensive and can cause redundant computations. Recently, various learning-based methods have been proposed for a good trade-off between accuracy and efficiency for query processing tasks. However, to the best of our knowledge, there is no learning-based method proposed for the supergraph search task. In this paper, we propose the first learning-based method for similarity search on supergraph containment, named Neural Supergraph similarity Search (NSS).NSSfirst learns the representations for query and data graphs and then efficiently conducts the supergraph search on the representation space whose complexity is linear to the number of data graphs. The carefully designed Wasserstein discriminator and reconstruction network enableNSSto better capture the interrelation, structural and label information between and within the query and data graphs. Experiments demonstrate that theNSSis up to 6 orders of magnitude faster than the state-of-the-art exact supergraph search algorithm in terms of query processing and more accurate compared to the other learning-based solutions."
 summary: "Supergraph search is a fundamental graph query processing problem. Supergraph search aims to find all data graphs contained in a given query graph based on the subgraph isomorphism."
 projects: []

@@ -1,27 +1,25 @@
 # Navigation Links
 #   To link a homepage widget, specify the URL as a hash `#` followed by the filename of the
-  #     desired widget in your `content/home/` folder.
-  #   The weight parameter defines the order that the links will appear in.
+#     desired widget in your `content/home/` folder.
+#   The weight parameter defines the order of the links will appear in.
+#   结构参考 hanchen-wang.com（About / News / Publications / Academic Services / Full List）
 
 main:
-  - name: Bio
+  - name: About
     url: /
     weight: 10
-  - name: Papers
-    url: /#papers
-    weight: 11
-  - name: Talks
-    url: /#talks
-    weight: 12
   - name: News
     url: /#news
-    weight: 13
-  - name: Experience
-    url: experience/
     weight: 20
-  - name: Projects
-    url: projects/
+  - name: Publications
+    url: /#publications
     weight: 30
-  - name: Courses
-    url: courses/
+  - name: Academic Services
+    url: /#services
     weight: 40
+  - name: Full List
+    url: /publications/
+    weight: 50
+  - name: CV
+    url: experience/
+    weight: 60
