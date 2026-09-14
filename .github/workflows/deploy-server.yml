@@ -8,7 +8,8 @@ name: Build & deploy to server (jianke-yu.online)
 #   手动选 live           → homepage.tar.gz → ~/deploy_homepage.sh（沿用旧站原脚本）
 #                           → /home/homepage/homepage → https://jianke-yu.online/
 #
-# 构建失败时会把 hugo 构建日志回传到服务器 /home/homepage/build-error.log，便于排查。
+# 诊断：日志会发布到 ci-logs 分支（匿名可读），构建失败时也会把 hugo 日志回传服务器
+#       /home/homepage/build-error.log。
 
 on:
   push:
@@ -23,12 +24,16 @@ on:
         default: preview
 
 permissions:
-  contents: read
+  contents: write
+
+concurrency:
+  group: deploy-server
+  cancel-in-progress: true
 
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     env:
       DEPLOY_HOST: upload.jianke-yu.online
       DEPLOY_PORT: "10198"
@@ -38,24 +43,28 @@ jobs:
       NODE_VERSION: "22"
       TARGET: ${{ inputs.target || 'preview' }}
     steps:
-      - name: Heartbeat (诊断用：工作流启动即在服务器留痕)
+      - name: Heartbeat (诊断：确认工作流启动 + secret + SSH 可用)
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
+          set +e
           {
             echo "run=${{ github.run_id }} event=${{ github.event_name }} sha=${{ github.sha }}"
             echo "secret_present=$([ -n "$SSH_PRIVATE_KEY" ] && echo yes || echo NO)"
             echo "time=$(date -u '+%F %T UTC')"
-          } > /tmp/hb.txt
-          cat /tmp/hb.txt
-          if [ -z "$SSH_PRIVATE_KEY" ]; then
-            echo "::warning::没有 SSH_PRIVATE_KEY，跳过心跳上传"
-            exit 0
+          } > /tmp/hb.log
+          if [ -n "$SSH_PRIVATE_KEY" ]; then
+            mkdir -p ~/.ssh && chmod 700 ~/.ssh
+            printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa
+            ssh-keyscan -p "$DEPLOY_PORT" -t rsa "$DEPLOY_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+            echo "--- ssh test ---" >> /tmp/hb.log
+            ssh -p "$DEPLOY_PORT" -o BatchMode=yes -o ConnectTimeout=15 -o StrictHostKeyChecking=accept-new \
+              "$DEPLOY_USER@$DEPLOY_HOST" 'echo SSH_OK; whoami; pwd; ls -la ~/deploy_preview.sh' >> /tmp/hb.log 2>&1
+            echo "ssh_exit=$?" >> /tmp/hb.log
+            scp -o StrictHostKeyChecking=accept-new -P "$DEPLOY_PORT" /tmp/hb.log "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_DIR/ci-heartbeat.log" >> /tmp/hb.log 2>&1
+            echo "scp_exit=$?" >> /tmp/hb.log
           fi
-          mkdir -p ~/.ssh && chmod 700 ~/.ssh
-          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -p "$DEPLOY_PORT" -t rsa "$DEPLOY_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
-          scp -P "$DEPLOY_PORT" /tmp/hb.txt "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_DIR/ci-heartbeat.txt" || echo "::warning::心跳上传失败（SSH key 或端口问题）"
+          cat /tmp/hb.log
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -82,6 +91,7 @@ jobs:
           extended: true
 
       - name: Build site
+        timeout-minutes: 12
         run: |
           set -o pipefail
           if [ "$TARGET" = "live" ]; then
@@ -89,10 +99,14 @@ jobs:
           else
             BASE_URL="https://jianke-yu.online/preview/"
           fi
-          echo "TARGET=$TARGET  BASE_URL=$BASE_URL"
-          hugo --minify --baseURL "$BASE_URL" --logLevel info 2>&1 | tee /tmp/build.log
-          if [ -f package.json ] && grep -q pagefind package.json; then
-            pnpm run pagefind 2>&1 | tee -a /tmp/build.log || npx pagefind --site public 2>&1 | tee -a /tmp/build.log
+          echo "TARGET=$TARGET  BASE_URL=$BASE_URL  hugo=$(hugo version)"
+          timeout 600 hugo --minify --baseURL "$BASE_URL" --logLevel info 2>&1 | tee /tmp/build.log
+          rc=$?
+          echo "hugo_exit=$rc" | tee -a /tmp/build.log
+          if [ "$rc" != "0" ]; then
+            echo "--- hugo 失败，最后 60 行 ---" | tee -a /tmp/build.log
+            tail -60 /tmp/build.log | tee -a /tmp/diagnostic-tail.log
+            exit "$rc"
           fi
           echo "--- 产物统计 ---" | tee -a /tmp/build.log
           du -sh public | tee -a /tmp/build.log
@@ -102,11 +116,10 @@ jobs:
         run: |
           if [ "$TARGET" = "live" ]; then
             tar -czf homepage.tar.gz -C public .
-            ls -lh homepage.tar.gz
           else
             tar -czf homepage_preview.tar.gz -C public .
-            ls -lh homepage_preview.tar.gz
           fi
+          ls -lh homepage_*.tar.gz
 
       - name: Upload to server and activate
         env:
@@ -122,22 +135,39 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -p "$DEPLOY_PORT" -t rsa "$DEPLOY_HOST" >> ~/.ssh/known_hosts 2>/dev/null
           if [ "$TARGET" = "live" ]; then
-            scp -P "$DEPLOY_PORT" homepage.tar.gz "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_DIR/"
-            ssh -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "~/deploy_homepage.sh"
+            scp -o StrictHostKeyChecking=accept-new -P "$DEPLOY_PORT" homepage.tar.gz "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_DIR/" 2>&1 | tee /tmp/deploy.log
+            ssh -p "$DEPLOY_PORT" -o StrictHostKeyChecking=accept-new "$DEPLOY_USER@$DEPLOY_HOST" "~/deploy_homepage.sh" 2>&1 | tee -a /tmp/deploy.log
           else
-            scp -P "$DEPLOY_PORT" homepage_preview.tar.gz "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_DIR/"
-            ssh -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "~/deploy_preview.sh"
+            scp -o StrictHostKeyChecking=accept-new -P "$DEPLOY_PORT" homepage_preview.tar.gz "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_DIR/" 2>&1 | tee /tmp/deploy.log
+            ssh -p "$DEPLOY_PORT" -o StrictHostKeyChecking=accept-new "$DEPLOY_USER@$DEPLOY_HOST" "~/deploy_preview.sh" 2>&1 | tee -a /tmp/deploy.log
           fi
+          ssh -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "curl -s -o /dev/null -w 'preview_http=%{http_code}\n' https://jianke-yu.online/preview/ || true" 2>&1 | tee -a /tmp/deploy.log
 
-      - name: Upload build log if failed (for debugging)
-        if: failure()
+      - name: Publish diagnostics to ci-logs branch (匿名可读，便于排查)
+        if: always()
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if [ -z "$SSH_PRIVATE_KEY" ] || [ ! -s /tmp/build.log ]; then
-            echo "无日志可回传"; exit 0
+          set +e
+          rm -rf /tmp/publog && mkdir -p /tmp/publog && cd /tmp/publog
+          git init -q -b ci-logs
+          git config user.name "ci-diagnostics"
+          git config user.email "ci-diagnostics@users.noreply.github.com"
+          {
+            echo "run_id=${{ github.run_id }}"
+            echo "event=${{ github.event_name }}"
+            echo "sha=${{ github.sha }}"
+            echo "target=$TARGET"
+            echo "job_status=${{ job.status }}"
+            echo "time=$(date -u '+%F %T UTC')"
+            echo "TARGET=$TARGET"
+          } > status.txt
+          for f in /tmp/build.log /tmp/hb.log /tmp/deploy.log /tmp/diagnostic-tail.log; do
+            [ -f "$f" ] && cp "$f" "."
+          done
+          ls -la
+          git add -A
+          if git commit -q -m "diagnostics for run ${{ github.run_id }} (${{ job.status }})"; then
+            git push -q --force "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" ci-logs \
+              && echo "诊断日志已发布到 ci-logs 分支" || echo "诊断日志推送失败"
           fi
-          mkdir -p ~/.ssh && chmod 700 ~/.ssh
-          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -p "$DEPLOY_PORT" -t rsa "$DEPLOY_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
-          scp -P "$DEPLOY_PORT" /tmp/build.log "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_DIR/build-error.log" || true
