@@ -38,6 +38,25 @@ jobs:
       NODE_VERSION: "22"
       TARGET: ${{ inputs.target || 'preview' }}
     steps:
+      - name: Heartbeat (诊断用：工作流启动即在服务器留痕)
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          {
+            echo "run=${{ github.run_id }} event=${{ github.event_name }} sha=${{ github.sha }}"
+            echo "secret_present=$([ -n "$SSH_PRIVATE_KEY" ] && echo yes || echo NO)"
+            echo "time=$(date -u '+%F %T UTC')"
+          } > /tmp/hb.txt
+          cat /tmp/hb.txt
+          if [ -z "$SSH_PRIVATE_KEY" ]; then
+            echo "::warning::没有 SSH_PRIVATE_KEY，跳过心跳上传"
+            exit 0
+          fi
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -p "$DEPLOY_PORT" -t rsa "$DEPLOY_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
+          scp -P "$DEPLOY_PORT" /tmp/hb.txt "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_DIR/ci-heartbeat.txt" || echo "::warning::心跳上传失败（SSH key 或端口问题）"
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
