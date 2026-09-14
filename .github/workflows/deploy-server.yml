@@ -108,6 +108,7 @@ jobs:
           echo "部署目标 = $TARGET（手动输入='${INPUT_TARGET}'，仓库文件='${FILE_TARGET}'，事件=${GITHUB_EVENT_NAME}）"
 
       - name: Build site
+        id: build
         timeout-minutes: 12
         run: |
           set -o pipefail
@@ -130,6 +131,7 @@ jobs:
           find public -type f | wc -l | tee -a /tmp/build.log
 
       - name: Pack static files
+        id: pack
         run: |
           if [ "$TARGET" = "live" ]; then
             tar -czf homepage.tar.gz -C public .
@@ -139,6 +141,7 @@ jobs:
           ls -lh homepage_*.tar.gz
 
       - name: Upload to server and activate
+        id: deploy
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
@@ -178,6 +181,11 @@ jobs:
             echo "job_status=${{ job.status }}"
             echo "time=$(date -u '+%F %T UTC')"
             echo "TARGET=$TARGET"
+            echo "--- 步骤结果 ---"
+            echo "target_resolve=${{ steps.target.outcome }}"
+            echo "build=${{ steps.build.outcome }}"
+            echo "pack=${{ steps.pack.outcome }}"
+            echo "deploy=${{ steps.deploy.outcome }}"
           } > status.txt
           for f in /tmp/build.log /tmp/hb.log /tmp/deploy.log /tmp/diagnostic-tail.log; do
             [ -f "$f" ] && cp "$f" "."
