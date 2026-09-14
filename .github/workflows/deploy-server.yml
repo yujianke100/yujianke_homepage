@@ -65,19 +65,6 @@ jobs:
           fi
           cat /tmp/hb.log
 
-      - name: Resolve deploy target (手动输入 > 仓库 .deploy-target 文件 > preview)
-        id: target
-        run: |
-          FILE_TARGET=$(tr -d '[:space:]' < .deploy-target 2>/dev/null || echo "")
-          TARGET="${{ inputs.target }}"
-          if [ -z "$TARGET" ]; then TARGET="${FILE_TARGET:-preview}"; fi
-          case "$TARGET" in
-            live|preview) ;;
-            *) echo "::error::非法部署目标: $TARGET"; exit 1 ;;
-          esac
-          echo "TARGET=$TARGET" >> "$GITHUB_ENV"
-          echo "部署目标 = $TARGET（输入=${{ inputs.target }}，文件=$FILE_TARGET）"
-
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -101,6 +88,19 @@ jobs:
         with:
           hugo-version: ${{ env.HUGO_VERSION }}
           extended: true
+
+      - name: Resolve deploy target (手动输入 > 仓库 .deploy-target 文件 > preview)
+        id: target
+        run: |
+          FILE_TARGET=$(tr -d '[:space:]' < .deploy-target 2>/dev/null || echo "")
+          TARGET="${{ inputs.target }}"
+          if [ -z "$TARGET" ]; then TARGET="${FILE_TARGET:-preview}"; fi
+          case "$TARGET" in
+            live|preview) ;;
+            *) echo "::error::非法部署目标: $TARGET"; exit 1 ;;
+          esac
+          echo "TARGET=$TARGET" >> "$GITHUB_ENV"
+          echo "部署目标 = $TARGET（输入=${{ inputs.target }}，文件=$FILE_TARGET）"
 
       - name: Build site
         timeout-minutes: 12
