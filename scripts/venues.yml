@@ -29,13 +29,11 @@ venues:
     jif: 11.6
     remarks: "中科院: 计算机科学 1区 [43/758] Top；小类 IS 1区[12/249], AI 2区[19/196], EE 2区[29/352]；JCR: AI Q1[16/210], IS Q1[6/266], EE Q1[12/369]"
 
-  "Proceedings of the ACM on Management of Data":
-    abbr: PACMMOD
-    kind: journal
+  "ACM SIGMOD Conference":
+    abbr: SIGMOD
+    kind: conference
     ccf: A
-    cas: null
-    jcr: null
-    remarks: "SIGMOD 旗下期刊(proc-journal)；未被中科院分区表/JCR 收录，故无分区徽章"
+    remarks: "CCF 目录中为 ACM SIGMOD Conference (A类会议)。论文实际发表在 SIGMOD 的 proceedings 期刊 Proceedings of the ACM on Management of Data (PACMMOD) 上——SIGMOD 已全面转为该期刊发表，故按会议呈现"
 
   "Data Science and Engineering":
     abbr: DSE
@@ -141,8 +139,8 @@ aliases:
     venue: "IEEE International Conference on High Performance Computing and Communications"
   - pattern: "Knowledge and Data Engineering"
     venue: "IEEE Transactions on Knowledge and Data Engineering"
-  - pattern: "Proceedings of the ACM on Management of Data|PACMMOD"
-    venue: "Proceedings of the ACM on Management of Data"
+  - pattern: "Proceedings of the ACM on Management of Data|PACMMOD|Management of Data"
+    venue: "ACM SIGMOD Conference"
   - pattern: "^Data Science and Engineering"
     venue: "Data Science and Engineering"
   - pattern: "^Information Sciences"

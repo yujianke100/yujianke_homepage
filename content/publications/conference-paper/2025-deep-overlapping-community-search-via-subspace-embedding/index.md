@@ -11,9 +11,9 @@ authors:
 author_position: 2
 date: 2025-02-10
 publishDate: 2025-02-10
-publication_types: ["article-journal"]
+publication_types: ["paper-conference"]
 publication:
-  name: "Proceedings of the ACM on Management of Data"
+  name: "ACM SIGMOD Conference"
   year: 2025
 peer_reviewed: true
 open_access: false
@@ -31,7 +31,7 @@ projects: []
 slides: ""
 ---
 
-> Proceedings of the ACM on Management of Data, 2025
+> ACM SIGMOD Conference, 2025
 
 Overlapping Community Search (OCS) identifies nodes that interact with multiple communities based on a specified query. Existing community search approaches fall into two categories: algorithm-based models and Machine Learning-based (ML) models. Despite the long-standing focus on this topic within the database domain, current solutions face two major limitations: 1) Both approaches fail to address personalized user requirements in OCS, consistently returning the same set of nodes for a given query regardless of user differences. 2) Existing ML-based CS models suffer from severe training efficiency issues. In this paper, we formally redefine the problem of OCS. By analyzing the gaps in both types of approaches, we then propose a general solution for OCS named S parse S ubspace F ilter (SSF), which can extend any ML-based CS model to enable personalized search in overlapping structures. To overcome the efficiency issue in the current models, we introduce S implified M ulti-hop Attention N etworks (SMN), a lightweight yet effective community search model with larger receptive fields. To the best of our knowledge, this is the first ML-based study of overlapping community search. Extensive experiments validate the superior performance of SMN within the SSF pipeline, achieving a 13.73% improvement in F1-Score and up to 3 orders of magnitude acceleration in model efficiency compared to state-of-the-art approaches.
 

@@ -431,15 +431,19 @@ def main() -> int:
 
     if not args.dry_run and not args.review:
         keep = {p.parent / "index.md" for p in written}
+        # 先收集再删除：边遍历边删目录会让 rglob 崩（FileNotFoundError）
+        stale = []
         for folder in FOLDERS:
             for old in (OUT_DIR / folder).rglob("index.md"):
                 if old in keep:
                     continue
                 if GENERATED_MARK in old.read_text(encoding="utf-8", errors="ignore"):
-                    print(f"  清除过期生成文件 {old.relative_to(ROOT)}")
-                    old.unlink()
-                    if not any(old.parent.iterdir()):
-                        old.parent.rmdir()
+                    stale.append(old)
+        for old in stale:
+            print(f"  清除过期生成文件 {old.relative_to(ROOT)}")
+            old.unlink()
+            if old.parent.exists() and not any(old.parent.iterdir()):
+                old.parent.rmdir()
 
     unmapped = sorted({r["venue"] for r in reviews if r["venue"].startswith("⚠")})
     if unmapped:
