@@ -1,17 +1,28 @@
 name: Sync publications (OpenAlex)
 
+# 定期把新论文同步进仓库：
+#   - OpenAlex(ORCID) 自动抓取 + scripts/extra_publications.yml 手工补充（已接收未收录的）
+#   - 有新论文时提交并建一个 GitHub Issue（会给你发邮件通知），不静默
+#   - 提交到 main 后由 deploy-server.yml 构建并上传到服务器（预览或正式）
+
 on:
   schedule:
-    # 每周一 03:00 UTC（北京时间 11:00）
-    - cron: "0 3 * * 1"
+    # 每天 22:00 UTC = 北京时间次日 06:00（比原来每周一次更及时）
+    - cron: "0 22 * * *"
   workflow_dispatch:
 
 permissions:
   contents: write
+  issues: write
+
+concurrency:
+  group: sync-publications
+  cancel-in-progress: false
 
 jobs:
   sync:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
 
@@ -23,16 +34,49 @@ jobs:
         run: pip install pyyaml
 
       - name: Sync publications from OpenAlex
-        run: python scripts/sync_publications.py
+        run: python scripts/sync_publications.py | tee /tmp/sync.log
 
       - name: Commit changes
+        id: commit
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "yujianke100"
+          git config user.email "yujianke100@gmail.com"
           git add content/publications
           if git diff --cached --quiet; then
-            echo "No publication changes."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "没有论文变化"
           else
-            git commit -m "chore: sync publications from OpenAlex"
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            git commit -m "chore(pubs): 自动同步论文列表（OpenAlex/ORCID）"
             git push
           fi
+
+      - name: Summarise what changed
+        if: steps.commit.outputs.changed == 'true'
+        run: |
+          {
+            echo "## 本次同步新增/修改的论文"
+            echo
+            git show --stat --oneline HEAD | tail -n +2 | grep "index.md" | sed 's/^/ - /'
+            echo
+            echo "## 同步脚本输出"
+            echo '```'
+            tail -40 /tmp/sync.log
+            echo '```'
+          } > /tmp/body.md
+          cat /tmp/body.md
+
+      - name: Notify via GitHub Issue (会给 yujianke100 发邮件)
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue create \
+            --repo "${{ github.repository }}" \
+            --title "📄 论文列表已更新（$(date -u '+%Y-%m-%d')）" \
+            --body-file /tmp/body.md \
+            --label publications 2>/dev/null || \
+          gh issue create \
+            --repo "${{ github.repository }}" \
+            --title "📄 论文列表已更新（$(date -u '+%Y-%m-%d')）" \
+            --body-file /tmp/body.md

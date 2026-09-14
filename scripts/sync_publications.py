@@ -97,6 +97,14 @@ def clean(text: str | None) -> str:
     return out.replace("\u2011", "-").replace("\u00a0", " ").strip()
 
 
+def fix_name(name: str) -> str:
+    """OpenAlex/Crossref 偶尔返回全大写作者名（如 YING ZHANG），统一成 Title Case。"""
+    n = clean(name)
+    if len(n) > 3 and n.isupper():
+        return " ".join(w.capitalize() for w in n.split())
+    return n
+
+
 def load_config() -> tuple[dict, list[tuple[re.Pattern, str]]]:
     data = yaml.safe_load(VENUES_FILE.read_text(encoding="utf-8")) or {}
     venues = {k: v for k, v in (data.get("venues") or {}).items() if isinstance(v, dict)}
@@ -236,7 +244,7 @@ def venue_of(work: dict, venues: dict, aliases: list[tuple[re.Pattern, str]],
 def authors_of(work: dict) -> tuple[list[str], int]:
     out, pos = [], 0
     for i, a in enumerate(work.get("authorships") or [], start=1):
-        name = clean((a.get("author") or {}).get("display_name", ""))
+        name = fix_name((a.get("author") or {}).get("display_name", ""))
         if name.lower() in OWN_NAMES:
             out.append("me")
             pos = pos or i
@@ -246,7 +254,7 @@ def authors_of(work: dict) -> tuple[list[str], int]:
 
 
 def coauthor_ok(work: dict) -> bool:
-    names = {clean((a.get("author") or {}).get("display_name", "")) for a in work.get("authorships") or []}
+    names = {fix_name((a.get("author") or {}).get("display_name", "")) for a in work.get("authorships") or []}
     return bool(names & COAUTHOR_WHITELIST)
 
 

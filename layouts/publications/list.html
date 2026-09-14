@@ -1,0 +1,85 @@
+{{/* 论文列表（本地覆盖 layouts/publications/list.html）
+     目的：提高可扫读性 —— 按年份分组、标题突出、作者/期刊/徽章分行显示、标注一作、给出 DOI。
+     数据来自 content/publications 下各 index.md（由 scripts/sync_publications.py 生成）。 */}}
+
+{{ define "main" }}
+{{ $pages := .Pages.ByDate.Reverse }}
+{{ $total := len $pages }}
+{{ $firstAuthor := where $pages "Params.author_position" 1 }}
+{{ $ccfA := 0 }}
+{{ range $pages }}
+  {{ range .Params.awards }}
+    {{ if eq .name "CCF-A" }}{{ $ccfA = add $ccfA 1 }}{{ end }}
+  {{ end }}
+{{ end }}
+
+<div class="max-w-3xl mx-auto px-4">
+
+  <h1 class="text-4xl font-bold tracking-tight text-gray-900 dark:text-white">{{ .Title }}</h1>
+
+  {{ with .Params.subtitle }}
+    <p class="mt-5 text-gray-600 dark:text-gray-400">{{ . | markdownify }}</p>
+  {{ end }}
+
+  <p class="mt-5 text-sm text-gray-500 dark:text-gray-400">
+    共 <strong class="text-gray-900 dark:text-gray-100">{{ $total }}</strong> 篇 ·
+    一作 <strong class="text-gray-900 dark:text-gray-100">{{ len $firstAuthor }}</strong> 篇 ·
+    CCF-A <strong class="text-gray-900 dark:text-gray-100">{{ $ccfA }}</strong> 篇
+    <span class="mx-2">|</span>
+    <a class="underline hover:text-primary-600" href="/#publications">返回首页精选</a>
+  </p>
+
+  <div class="mt-10 space-y-12">
+    {{ range $pages.GroupByDate "2006" }}
+      <section>
+        <h2 class="flex items-center gap-3 text-2xl font-bold text-gray-900 dark:text-white">
+          <span>{{ .Key }}</span>
+          <span class="h-px flex-1 bg-gray-200 dark:bg-gray-700"></span>
+          <span class="text-sm font-normal text-gray-400">{{ len .Pages }} 篇</span>
+        </h2>
+
+        <ol class="mt-6 space-y-6 pl-0 list-none">
+          {{ range .Pages }}
+            <li class="pub-entry">
+              {{/* 标题：最大权重，点击进详情页 */}}
+              <a href="{{ .RelPermalink }}"
+                 class="text-lg font-semibold leading-snug text-gray-900 dark:text-gray-100 hover:text-primary-600 dark:hover:text-primary-400">
+                {{ .Title }}
+              </a>
+
+              {{/* 作者：本人加粗（partial 已覆盖） */}}
+              <div class="mt-1.5 text-sm text-gray-600 dark:text-gray-400">
+                {{ partial "page_metadata_authors" . }}.
+              </div>
+
+              {{/* 期刊/会议 + 徽章 */}}
+              <div class="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm">
+                <span class="italic text-gray-700 dark:text-gray-300">
+                  {{ with .Params.publication }}{{ .name }}{{ with .year }}, {{ . }}{{ end }}{{ end }}
+                </span>
+
+                {{ with .Params.author_position }}
+                  {{ if eq . 1 }}
+                    <span class="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-900 dark:bg-amber-900/40 dark:text-amber-200"
+                          title="第一作者">第一作者</span>
+                  {{ end }}
+                {{ end }}
+
+                {{ range .Params.awards }}
+                  <span class="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold text-emerald-900 dark:bg-emerald-900/40 dark:text-emerald-200"
+                        title="{{ .name }}">{{ .name }}</span>
+                {{ end }}
+
+                {{ with .Params.hugoblox }}{{ with .ids }}{{ with .doi }}
+                  <a class="text-xs underline text-gray-500 hover:text-primary-600"
+                     href="https://doi.org/{{ . }}" target="_blank" rel="noopener">DOI</a>
+                {{ end }}{{ end }}{{ end }}
+              </div>
+            </li>
+          {{ end }}
+        </ol>
+      </section>
+    {{ end }}
+  </div>
+</div>
+{{ end }}
