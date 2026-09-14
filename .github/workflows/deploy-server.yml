@@ -39,7 +39,7 @@ jobs:
       DEPLOY_PORT: "10198"
       DEPLOY_USER: homepage
       DEPLOY_DIR: /home/homepage
-      HUGO_VERSION: "0.162.0"
+      HUGO_VERSION: "0.162.1"
       NODE_VERSION: "22"
       TARGET: ${{ inputs.target || 'preview' }}
     steps:
