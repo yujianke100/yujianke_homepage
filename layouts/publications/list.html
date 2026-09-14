@@ -40,6 +40,7 @@
 
         <ol class="mt-6 space-y-6 pl-0 list-none">
           {{ range .Pages }}
+            {{ $item := . }}
             <li class="pub-entry">
               {{/* 标题：最大权重，点击进详情页 */}}
               <a href="{{ .RelPermalink }}"
@@ -60,14 +61,13 @@
 
                 {{ with .Params.author_position }}
                   {{ if eq . 1 }}
-                    <span class="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-900 dark:bg-amber-900/40 dark:text-amber-200"
+                    <span class="inline-flex items-center rounded-full bg-gray-900 px-2 py-0.5 text-[11px] font-semibold text-white dark:bg-gray-100 dark:text-gray-900"
                           title="第一作者">第一作者</span>
                   {{ end }}
                 {{ end }}
 
                 {{ range .Params.awards }}
-                  <span class="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold text-emerald-900 dark:bg-emerald-900/40 dark:text-emerald-200"
-                        title="{{ .name }}">{{ .name }}</span>
+                  {{ partial "components/award_badge.html" (dict "award" . "page" $item "variant" "pill") }}
                 {{ end }}
 
                 {{ with .Params.hugoblox }}{{ with .ids }}{{ with .doi }}

@@ -2,7 +2,7 @@
 #   To link a homepage widget, specify the URL as a hash `#` followed by the filename of the
 #     desired widget in your `content/home/` folder.
 #   The weight parameter defines the order of the links will appear in.
-#   结构参考 hanchen-wang.com（About / News / Publications / Academic Services / Full List）
+#   顺序：Publications 之后紧跟 Full List（完整论文列表）
 
 main:
   - name: About
@@ -14,12 +14,12 @@ main:
   - name: Publications
     url: /#publications
     weight: 30
+  - name: Full List
+    url: /publications/
+    weight: 35
   - name: Academic Services
     url: /#services
     weight: 40
-  - name: Full List
-    url: /publications/
-    weight: 50
   - name: CV
     url: experience/
-    weight: 60
+    weight: 50

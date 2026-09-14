@@ -67,7 +67,7 @@ sections:
     id: publications
     content:
       title: 📄 Selected Publications
-      subtitle: First-author papers in CCF-A venues. **[→ Full publication list](/publications/)** (auto-synced from OpenAlex/ORCID, with CCF / 中科院分区 / JCR badges)
+      subtitle: 'First-author CCF-A papers. Badges: CCF / 中科院分区 / JCR'
       filters:
         folders:
           - publications
@@ -75,6 +75,20 @@ sections:
     design:
       view: citation
       columns: 1
+
+  # ---------- 完整列表入口（紧跟 Selected Publications） ----------
+  - block: markdown
+    id: full-list
+    content:
+      text: |-
+        <div class="not-prose flex justify-center pt-2">
+          <a href="/publications/"
+             class="inline-flex items-center gap-2 rounded-lg bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white no-underline shadow-sm transition hover:bg-primary-700 hover:no-underline dark:bg-primary-500 dark:hover:bg-primary-600">
+            Full publication list →
+          </a>
+        </div>
+    design:
+      columns: '1'
 
   # ---------- 学术服务 ----------
   - block: markdown

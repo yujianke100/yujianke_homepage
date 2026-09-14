@@ -1,0 +1,43 @@
+{{/*
+  citation 视图 — 本地覆盖（layouts/_partials/views/citation.html）
+  与原版差异：标题提到前面并加粗（原来作者在前、标题夹在句子中间，扫读很累）、
+  显示**全部**徽章（原版只显示 awards 的第一条）、一行一论文、带 DOI 与一作标记。
+  用于首页 Selected Publications。
+*/}}
+{{ $item := .item }}
+{{ $year_value := $item.Params.event_start | default $item.Date }}
+{{ $year := (time $year_value).Format "2006" }}
+{{ $pub := partial "functions/resolve_publication.html" $item }}
+
+<div class="pub-list-item view-citation py-4 border-b border-gray-100 dark:border-gray-800 last:border-0">
+
+  <a href="{{ $item.RelPermalink }}"
+     class="text-base font-semibold leading-snug text-gray-900 dark:text-gray-100 hover:text-primary-600 dark:hover:text-primary-400">
+    {{ $item.Title }}
+  </a>
+
+  <div class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+    {{ partial "page_metadata_authors" $item }}.
+  </div>
+
+  <div class="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-sm">
+    <span class="italic text-gray-700 dark:text-gray-300">
+      {{- with $pub.display_short }}{{ . | markdownify }}{{ else }}{{ with $pub.name }}{{ . }}{{ end }}{{ end -}}
+      {{- with $year }}, {{ . }}{{ end -}}
+    </span>
+
+    {{ if eq ($item.Params.author_position | default 0) 1 }}
+      <span class="inline-flex items-center rounded-full bg-gray-900 px-2 py-0.5 text-[11px] font-semibold text-white dark:bg-gray-100 dark:text-gray-900"
+            title="第一作者">第一作者</span>
+    {{ end }}
+
+    {{ range $item.Params.awards }}
+      {{ partial "components/award_badge.html" (dict "award" . "page" $item "variant" "pill") }}
+    {{ end }}
+
+    {{ with $item.Params.hugoblox }}{{ with .ids }}{{ with .doi }}
+      <a class="text-xs underline text-gray-500 hover:text-primary-600"
+         href="https://doi.org/{{ . }}" target="_blank" rel="noopener">DOI</a>
+    {{ end }}{{ end }}{{ end }}
+  </div>
+</div>

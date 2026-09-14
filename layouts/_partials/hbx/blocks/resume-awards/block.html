@@ -1,0 +1,84 @@
+{{/*
+  Hugo Blox: Awards（本地覆盖 layouts/_partials/blox/resume-awards/block.html）
+  与原版差异：原版每条奖项渲染成一张全宽大卡片（p-6 + 2xl 标题 + 日期行 + 摘要），
+  7 条奖项要滚很久，密度极低。这里改成**两列紧凑列表**：图标 + 标题 + 「颁发方 · 年份」一行。
+  数据源不变：data/authors/<username>.yaml 的 awards 字段。
+*/}}
+{{ $page := .wcPage }}
+{{ $block := .wcBlock }}
+{{ $content := $block.content }}
+{{ if not (reflect.IsMap $content) }}{{ $content = dict }}{{ end }}
+{{ $design := $block.design }}
+{{ if not (reflect.IsMap $design) }}{{ $design = dict }}{{ end }}
+
+{{ $username := "me" }}
+{{ $username_raw := index $content "username" }}
+{{ if eq (printf "%T" $username_raw) "string" }}
+  {{ $username = strings.TrimSpace $username_raw }}
+{{ end }}
+{{ $profile := partial "functions/get_author_profile" $username }}
+
+{{ $awards_iter := slice }}
+{{ if reflect.IsSlice $profile.awards }}
+  {{ $awards_iter = $profile.awards }}
+{{ else if reflect.IsMap $profile.awards }}
+  {{ range $profile.awards }}{{ $awards_iter = $awards_iter | append . }}{{ end }}
+{{ end }}
+
+{{ $awards := slice }}
+{{ range $awards_iter }}
+  {{ if reflect.IsMap . }}
+    {{ $title := strings.TrimSpace (printf "%v" (index . "title" | default "")) }}
+    {{ $icon := strings.TrimSpace (printf "%v" (index . "icon" | default "")) }}
+    {{ $awarder := strings.TrimSpace (printf "%v" (index . "awarder" | default "")) }}
+    {{ $date := strings.TrimSpace (printf "%v" (index . "date" | default "")) }}
+    {{ $date_start := strings.TrimSpace (printf "%v" (index . "date_start" | default "")) }}
+    {{ $summary := strings.TrimSpace (printf "%v" (index . "summary" | default "")) }}
+    {{ if $title }}
+      {{ $awards = $awards | append (dict
+          "title" $title "icon" $icon "awarder" $awarder "summary" $summary
+          "date_sort" ($date | default $date_start)) }}
+    {{ end }}
+  {{ else if . }}
+    {{ $awards = $awards | append (dict "title" (printf "%v" .) "icon" "" "awarder" "" "summary" "" "date_sort" "") }}
+  {{ end }}
+{{ end }}
+
+{{ $title := "" }}
+{{ $title_raw := index $content "title" }}
+{{ if $title_raw }}{{ $title = strings.TrimSpace (printf "%v" $title_raw) }}{{ end }}
+
+<div class="max-w-3xl mx-auto">
+
+  <div class="mb-6 text-center text-3xl font-bold text-gray-900 dark:text-white">
+    {{ $title | markdownify | emojify }}
+  </div>
+
+  <ul class="not-prose grid grid-cols-1 gap-x-10 gap-y-3 sm:grid-cols-2 list-none pl-0 m-0">
+    {{ range sort $awards "date_sort" "desc" }}
+      <li class="flex items-start gap-2.5 text-sm leading-snug">
+        <span class="mt-0.5 inline-flex h-4 w-4 flex-shrink-0 items-center justify-center text-amber-600 dark:text-amber-300">
+          {{ with index . "icon" }}
+            {{ partial "functions/get_icon" (dict "name" . "attributes" "class='w-4 h-4'") }}
+          {{ else }}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4ZM5 4H3v2a3 3 0 0 0 3 3M19 4h2v2a3 3 0 0 1-3 3"/></svg>
+          {{ end }}
+        </span>
+        <span class="min-w-0">
+          <span class="font-semibold text-gray-900 dark:text-gray-100">{{ index . "title" | markdownify | emojify }}</span>
+          {{ $awarder := index . "awarder" }}
+          {{ $date := index . "date_sort" }}
+          {{ $date_display := $date }}
+          {{ if findRE `^[0-9]{4}` $date }}{{ $date_display = substr $date 0 4 }}{{ end }}
+          {{ if or $awarder $date_display }}
+            <span class="text-gray-500 dark:text-gray-400">
+              {{- with $awarder }} · {{ . }}{{ end -}}
+              {{- with $date_display }} · {{ . }}{{ end -}}
+            </span>
+          {{ end }}
+        </span>
+      </li>
+    {{ end }}
+  </ul>
+
+</div>
