@@ -1,0 +1,175 @@
+schema: hugoblox/author/v1
+slug: me
+is_owner: true
+name:
+  display: Jianke Yu
+  given: Jianke
+  family: Yu
+  alternate: 俞鉴珂
+  pronunciation: ''
+  pronouns: he/him
+postnominals:
+  - PhD
+status:
+  icon: "📊"
+role: PhD Researcher in Graph Machine Learning & Databases
+bio: |
+  I am a PhD researcher at the University of Technology Sydney (UTS), supervised by
+  Prof. Ying Zhang and A/Prof. Lu Qin. My research develops machine learning algorithms
+  for graph-structured data and database systems — graph neural network architectures,
+  and learning-based methods that improve database and data-mining algorithms
+  (fraud detection, graph similarity, supergraph search, malware detection).
+  My work has appeared in KDD and IEEE TKDE. I am joining Zhejiang Gongshang
+  University as a faculty member in 2027.
+
+affiliations:
+  - name: University of Technology Sydney
+    url: https://www.uts.edu.au/
+  - name: Zhejiang Gongshang University (incoming, 2027)
+    url: https://www.zjgsu.edu.cn/
+
+links:
+  - icon: at-symbol
+    url: mailto:yujianke100@gmail.com
+    label: E-mail Me
+  - icon: academicons/google-scholar
+    url: https://scholar.google.com/citations?user=EwomMksAAAAJ
+    label: Google Scholar
+  - icon: academicons/orcid
+    url: https://orcid.org/0000-0002-2032-7727
+    label: ORCID
+  - icon: academicons/dblp
+    url: https://dblp.org/pid/316/0485.html
+    label: DBLP
+  - icon: brands/github
+    url: https://github.com/yujianke100
+    label: GitHub
+  - icon: brands/researchgate
+    url: https://www.researchgate.net/profile/Jianke-Yu
+    label: ResearchGate
+
+interests:
+  - Graph Neural Networks
+  - Graph Databases
+  - AI for Databases
+  - Fraud Detection
+  - Knowledge Graphs
+
+education:
+  - degree: PhD, Information Technology
+    institution: University of Technology Sydney
+    start: 2023-07-01
+    end: 2026-12-31
+    summary: |
+      Supervised by Prof. Ying Zhang and A/Prof. Lu Qin. Thesis on learning-based
+      algorithms for graph-structured data and database systems. Published in KDD 2023,
+      IEEE TKDE (2024, 2025, 2026). Recipient of the UTS FEIT HDR Excellence Award (2025).
+  - degree: M.Eng, Electronic Information
+    institution: Zhejiang Gongshang University
+    start: 2020-09-01
+    end: 2023-06-30
+    summary: |
+      Supervised by Prof. Xiaoyang Wang. Research on graph representation learning,
+      fraud detection and graph similarity computation.
+  - degree: B.Eng, Electronic Information Engineering
+    institution: Zhejiang Gongshang University
+    start: 2016-09-01
+    end: 2020-06-30
+
+experience:
+  - role: Incoming Faculty Member
+    org: Zhejiang Gongshang University
+    start: 2027-03-01
+    summary: |
+      Joining as a faculty member (talent introduction programme), School of
+      Computer Science and Information Engineering / related department.
+  - role: Research Intern
+    org: Token Foundry, Alibaba Token Hub, Alibaba Group
+    start: 2025-12-11
+    summary: |
+      Research on graph learning methods for industrial data systems.
+  - role: Research Assistant
+    org: University of Technology Sydney
+    start: 2023-07-01
+    summary: |
+      ARC Discovery Project. Graph neural networks, graph similarity search and
+      learning-based database algorithms.
+  - role: Guest Lecturer
+    org: University of Technology Sydney
+    start: 2025-01-01
+    end: 2025-12-31
+    summary: |
+      Guest lecturer for UTS 43023 Emerging Topics in AI (Spring 2025).
+  - role: Research Intern
+    org: DAMO Academy / Alibaba Cloud, Alibaba Group
+    start: 2022-07-18
+    end: 2023-04-28
+    summary: |
+      Fraud detection on e-commerce platforms (work later published in KDD 2023 and IEEE TKDE).
+  - role: Research Intern
+    org: Taobao, Alibaba Group
+    start: 2021-11-18
+    end: 2022-03-31
+    summary: |
+      Graph-based user modelling and risk analysis.
+
+skills:
+  - name: Technical Skills
+    items:
+      - label: Graph Neural Networks
+        level: 5
+      - label: Python / PyTorch
+        level: 5
+      - label: Graph Databases & Query Processing
+        level: 4
+      - label: Data Mining & Fraud Detection
+        level: 5
+  - name: Research & Service
+    items:
+      - label: Academic Writing & Publishing
+        level: 5
+      - label: Peer Review (IEEE TKDE)
+        level: 4
+      - label: Teaching & Student Supervision
+        level: 4
+
+languages:
+  - name: Chinese
+    level: 5
+    label: Native
+  - name: English
+    level: 5
+    label: Fluent
+
+awards:
+  - title: Award for Outstanding Overseas Study Elite (2025–2026)
+    awarder: China Scholarship Council
+    date: "2026-01-01"
+    summary: National-level award for outstanding self-financed PhD students abroad.
+    icon: hero/trophy
+  - title: UTS FEIT HDR Excellence Award (Individual Category)
+    awarder: University of Technology Sydney, Faculty of Engineering and IT
+    date: "2025-06-01"
+    summary: Faculty award for research excellence during HDR candidature.
+    icon: hero/trophy
+  - title: UTS ARC Discovery Project Scholarship (Full Scholarship)
+    awarder: University of Technology Sydney / Australian Research Council
+    date: "2023-07-01"
+    icon: hero/academic-cap
+  - title: UTS International Research Scholarship
+    awarder: University of Technology Sydney
+    date: "2023-07-01"
+    icon: hero/academic-cap
+  - title: Excellent Practical Achievement Award for Professional Master Students
+    awarder: Education Department of Zhejiang Province
+    date: "2022-06-01"
+    summary: Provincial award for outstanding professional master's practice achievements.
+    icon: hero/trophy
+  - title: Second Prize, 4th Zhejiang Province University Student Robotics Competition
+    awarder: Zhejiang Province
+    summary: Year to be confirmed.
+    icon: hero/trophy
+  - title: Second Prize, “Internet+” Innovation and Entrepreneurship Competition
+    awarder: Zhejiang Gongshang University
+    summary: Year to be confirmed.
+    icon: hero/trophy

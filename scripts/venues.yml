@@ -1,0 +1,81 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# 期刊/会议等级映射表（人工维护，同步管线读取）
+# 数据口径：CCF 推荐目录 2026 / 中科院分区表 2025（升级版）/ JCR 2025
+# 说明：cas(Top) = 中科院大类分区；jcr = JCR 分区；null 表示暂无/待核
+# 新增论文的 venue 若不在表内，管线会跳过徽章并在日志中提示补录
+# ══════════════════════════════════════════════════════════════════════════════
+
+venues:
+  # ----- 期刊（CCF 已核实 2026 版；中科院/JCR 待用数据集回填）-----
+  "IEEE Transactions on Knowledge and Data Engineering":
+    abbr: TKDE
+    ccf: A
+    cas: null      # 待回填（预期 计算机科学 1区）
+    jcr: null
+    type: journal
+
+  "Information Sciences":
+    abbr: Inf. Sci.
+    ccf: B
+    cas: null      # 待回填（预期 计算机科学 1区）
+    jcr: null
+    type: journal
+
+  "World Wide Web":
+    abbr: WWWJ
+    ccf: null      # 2026 目录未收录，待核（历史版本为 B）
+    cas: null
+    jcr: null
+    type: journal
+
+  "Data Science and Engineering":
+    abbr: DSE
+    ccf: B
+    cas: null
+    jcr: null
+    type: journal
+
+  "Proceedings of the ACM on Management of Data":
+    abbr: PACMMOD
+    ccf: A        # 对应 SIGMOD 系（2026 目录：SIGMOD Conference = A 会议）
+    cas: null
+    jcr: null
+    type: journal
+
+  # ----- 会议 -----
+  "ACM SIGKDD Conference on Knowledge Discovery and Data Mining":
+    abbr: KDD
+    ccf: A
+    cas: null
+    jcr: null
+    type: conference
+
+  "ACM SIGMOD Conference":
+    abbr: SIGMOD
+    ccf: A
+    type: conference
+
+  "International Conference on Database Systems for Advanced Applications":
+    abbr: DASFAA
+    ccf: B
+    type: conference
+
+  "Pacific-Asia Conference on Knowledge Discovery and Data Mining":
+    abbr: PAKDD
+    ccf: C
+    type: conference
+
+  "International Conference on Advanced Data Mining and Applications":
+    abbr: ADMA
+    ccf: C
+    type: conference
+
+  "IEEE International Conference on High Performance Computing and Communications":
+    abbr: HPCC
+    ccf: C
+    type: conference
+
+  "Asia Pacific Web Conference":
+    abbr: APWeb
+    ccf: C
+    type: conference
