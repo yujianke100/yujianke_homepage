@@ -5,7 +5,7 @@ name: Build & deploy to server (jianke-yu.online)
 #
 #   push / 手动选 preview → homepage_preview.tar.gz → ~/deploy_preview.sh
 #                           → /home/homepage/homepage_preview → https://jianke-yu.online/preview/
-#   手动选 live           → homepage.tar.gz → ~/deploy_homepage.sh（沿用旧站原脚本）
+#   自动/手动 live        → homepage.tar.gz → ~/deploy_live.sh（备份→暂存校验→原子替换）
 #                           → /home/homepage/homepage → https://jianke-yu.online/
 #
 # 诊断：日志会发布到 ci-logs 分支（匿名可读），构建失败时也会把 hugo 日志回传服务器
@@ -41,7 +41,6 @@ jobs:
       DEPLOY_DIR: /home/homepage
       HUGO_VERSION: "0.162.1"
       NODE_VERSION: "22"
-      TARGET: ${{ inputs.target || 'preview' }}
     steps:
       - name: Heartbeat (诊断：确认工作流启动 + secret + SSH 可用)
         env:
@@ -65,6 +64,19 @@ jobs:
             echo "scp_exit=$?" >> /tmp/hb.log
           fi
           cat /tmp/hb.log
+
+      - name: Resolve deploy target (手动输入 > 仓库 .deploy-target 文件 > preview)
+        id: target
+        run: |
+          FILE_TARGET=$(tr -d '[:space:]' < .deploy-target 2>/dev/null || echo "")
+          TARGET="${{ inputs.target }}"
+          if [ -z "$TARGET" ]; then TARGET="${FILE_TARGET:-preview}"; fi
+          case "$TARGET" in
+            live|preview) ;;
+            *) echo "::error::非法部署目标: $TARGET"; exit 1 ;;
+          esac
+          echo "TARGET=$TARGET" >> "$GITHUB_ENV"
+          echo "部署目标 = $TARGET（输入=${{ inputs.target }}，文件=$FILE_TARGET）"
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -136,7 +148,7 @@ jobs:
           ssh-keyscan -p "$DEPLOY_PORT" -t rsa "$DEPLOY_HOST" >> ~/.ssh/known_hosts 2>/dev/null
           if [ "$TARGET" = "live" ]; then
             scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=accept-new -P "$DEPLOY_PORT" homepage.tar.gz "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_DIR/" 2>&1 | tee /tmp/deploy.log
-            ssh -i ~/.ssh/id_rsa -p "$DEPLOY_PORT" -o StrictHostKeyChecking=accept-new "$DEPLOY_USER@$DEPLOY_HOST" "~/deploy_homepage.sh" 2>&1 | tee -a /tmp/deploy.log
+            ssh -i ~/.ssh/id_rsa -p "$DEPLOY_PORT" -o StrictHostKeyChecking=accept-new "$DEPLOY_USER@$DEPLOY_HOST" "~/deploy_live.sh" 2>&1 | tee -a /tmp/deploy.log
           else
             scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=accept-new -P "$DEPLOY_PORT" homepage_preview.tar.gz "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_DIR/" 2>&1 | tee /tmp/deploy.log
             ssh -i ~/.ssh/id_rsa -p "$DEPLOY_PORT" -o StrictHostKeyChecking=accept-new "$DEPLOY_USER@$DEPLOY_HOST" "~/deploy_preview.sh" 2>&1 | tee -a /tmp/deploy.log
