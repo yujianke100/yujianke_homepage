@@ -1,0 +1,10 @@
+run=34822026994 event=push sha=dd649daefb4b861277b082b2435a4358a9a0d77a
+secret_present=yes
+time=2026-09-14 08:18:14 UTC
+--- ssh test ---
+SSH_OK
+homepage
+/home/homepage
+-rwxr-xr-x 1 homepage homepage 611 Sep 14 12:31 /home/homepage/deploy_preview.sh
+ssh_exit=0
+scp_exit=0

@@ -1,0 +1,75 @@
+hugo: downloading modules …
+hugo: collected modules in 6322 ms
+Start building sites … 
+hugo v0.162.1-bba860e3eda3091efe8c6d1a96bc49a29ad2d5f6+extended linux/amd64 BuildDate=2026-05-28T17:40:44Z VendorInfo=gohugoio
+
+INFO  static: syncing static files to / duration 511.529µs
+INFO  build:  step process substep collect files 29 files_total 29 pagesources_total 29 resourcesources_total 0 duration 2.231695ms
+INFO  build:  step process duration 2.269378ms
+INFO  build:  step assemble duration 13.678411ms
+INFO  webp: started dispatcher in 245.457505ms
+INFO  build:  step render substep pages site en outputFormat html duration 1.155453677s
+INFO  build:  step render substep pages site en outputFormat backlinks duration 2.025896ms
+INFO  build:  step render substep pages site en outputFormat headers duration 225.11µs
+INFO  build:  step render substep pages site en outputFormat redirects duration 431.754µs
+INFO  build:  step render substep pages site en outputFormat rss duration 3.194433ms
+INFO  build:  step render pages 47 content 83 duration 1.161815841s
+INFO  exec: resolve "tailwindcss" location node_modules/.bin bin /home/runner/work/yujianke_homepage/yujianke_homepage/node_modules/.bin/tailwindcss script /home/runner/work/yujianke_homepage/yujianke_homepage/node_modules/@tailwindcss/cli/dist/index.mjs
+INFO  tailwindcss: ≈ tailwindcss v4.2.4
+INFO  tailwindcss: 
+INFO  tailwindcss: Done in 299ms
+INFO  build:  step render deferred count 34 duration 697.08328ms
+INFO  build:  step postProcess duration 183.533µs
+INFO  build:  duration 1.876833904s
+
+                  │ EN 
+──────────────────┼────
+ Pages            │ 47 
+ Paginator pages  │  0 
+ Non-page files   │  0 
+ Static files     │  3 
+ Processed images │ 11 
+ Aliases          │  4 
+ Cleaned          │  0 
+
+Total in 8441 ms
+hugo_exit=0
+--- 产物统计 ---
+6.0M	public
+132
+
+> hugo-blox-academic-cv-starter@1.0.0 pagefind /home/runner/work/yujianke_homepage/yujianke_homepage
+> pagefind --site public
+
+
+Running Pagefind v1.5.2 (Extended)
+Running from: "/home/runner/work/yujianke_homepage/yujianke_homepage"
+Source:       "public"
+Output:       "public/pagefind"
+
+[Walking source directory]
+Found 38 files matching **/*.{html}
+
+[Parsing files]
+Found a data-pagefind-body element on the site.
+↳ Ignoring pages without this tag.
+
+[Reading languages]
+Discovered 1 language: en-us
+
+[Building search indexes]
+Total: 
+  Indexed 1 language
+  Indexed 24 pages
+  Indexed 665 words
+  Indexed 2 filters
+  Indexed 0 sorts
+
+Finished in 0.045 seconds
+--- pagefind 产物 ---
+filter
+fragment
+index
+pagefind-component-ui.css
+pagefind-component-ui.js
+索引文件数: 40
