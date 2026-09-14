@@ -1,16 +1,18 @@
 name: Build & deploy to server (jianke-yu.online)
 
-# 拓扑与旧站一致：GitHub Actions 负责构建（服务器 CPU 弱，不参与构建），
-# 只把构建好的静态文件打包上传到 upload.jianke-yu.online，由服务器上的
-# 脚本解包到 webroot。Hugo 版本从 hugoblox.yaml 读取。
+# 拓扑：GitHub Actions 负责构建（服务器 CPU 弱，不参与构建），只把构建好的
+# 静态文件打包上传到 upload.jianke-yu.online，由服务器上的脚本解包。
 #
-# 目标目录：
-#   preview → 预览子目录（默认，不碰正式站）
-#   live    → 正式站根目录（预览验收通过后再用）
+#   push / 手动选 preview → homepage_preview.tar.gz → ~/deploy_preview.sh
+#                           → /home/homepage/homepage_preview → https://jianke-yu.online/preview/
+#   手动选 live           → homepage.tar.gz → ~/deploy_homepage.sh（沿用旧站原脚本）
+#                           → /home/homepage/homepage → https://jianke-yu.online/
 #
-# 预览验证通过后，取消下面 push 触发的注释即可实现"推送即上线"。
+# 构建失败时会把 hugo 构建日志回传到服务器 /home/homepage/build-error.log，便于排查。
 
 on:
+  push:
+    branches: ['main']
   workflow_dispatch:
     inputs:
       target:
@@ -19,8 +21,6 @@ on:
         type: choice
         options: [preview, live]
         default: preview
-  # push:
-  #   branches: ['main']
 
 permissions:
   contents: read
@@ -28,7 +28,7 @@ permissions:
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     env:
       DEPLOY_HOST: upload.jianke-yu.online
       DEPLOY_PORT: "10198"
@@ -41,7 +41,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0   # Hugo .GitInfo / .Lastmod 需要完整历史
+          fetch-depth: 0   # Hugo 的 .GitInfo/.Lastmod 需要完整历史
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -64,34 +64,61 @@ jobs:
 
       - name: Build site
         run: |
+          set -o pipefail
           if [ "$TARGET" = "live" ]; then
             BASE_URL="https://jianke-yu.online/"
           else
             BASE_URL="https://jianke-yu.online/preview/"
           fi
-          echo "BASE_URL=$BASE_URL"
-          hugo --minify --baseURL "$BASE_URL"
+          echo "TARGET=$TARGET  BASE_URL=$BASE_URL"
+          hugo --minify --baseURL "$BASE_URL" --logLevel info 2>&1 | tee /tmp/build.log
           if [ -f package.json ] && grep -q pagefind package.json; then
-            pnpm run pagefind || npx pagefind --site public
+            pnpm run pagefind 2>&1 | tee -a /tmp/build.log || npx pagefind --site public 2>&1 | tee -a /tmp/build.log
           fi
+          echo "--- 产物统计 ---" | tee -a /tmp/build.log
+          du -sh public | tee -a /tmp/build.log
+          find public -type f | wc -l | tee -a /tmp/build.log
 
       - name: Pack static files
         run: |
-          ls -la public | head -20
-          tar -czf site.tar.gz -C public .
+          if [ "$TARGET" = "live" ]; then
+            tar -czf homepage.tar.gz -C public .
+            ls -lh homepage.tar.gz
+          else
+            tar -czf homepage_preview.tar.gz -C public .
+            ls -lh homepage_preview.tar.gz
+          fi
 
       - name: Upload to server and activate
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
+          set -e
           if [ -z "$SSH_PRIVATE_KEY" ]; then
-            echo "::error::缺少 secret SSH_PRIVATE_KEY（与旧仓库同一个部署私钥）"
+            echo "::error::缺少 secret SSH_PRIVATE_KEY（需要与旧仓库相同的部署私钥）"
             exit 1
           fi
           mkdir -p ~/.ssh && chmod 700 ~/.ssh
           printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -p "$DEPLOY_PORT" -t rsa "$DEPLOY_HOST" >> ~/.ssh/known_hosts 2>/dev/null
-          scp -P "$DEPLOY_PORT" site.tar.gz "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_DIR/"
-          ssh -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" \
-            "TARGET=$TARGET DEPLOY_DIR=$DEPLOY_DIR ~/deploy_homepage.sh"
+          if [ "$TARGET" = "live" ]; then
+            scp -P "$DEPLOY_PORT" homepage.tar.gz "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_DIR/"
+            ssh -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "~/deploy_homepage.sh"
+          else
+            scp -P "$DEPLOY_PORT" homepage_preview.tar.gz "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_DIR/"
+            ssh -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "~/deploy_preview.sh"
+          fi
+
+      - name: Upload build log if failed (for debugging)
+        if: failure()
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          if [ -z "$SSH_PRIVATE_KEY" ] || [ ! -s /tmp/build.log ]; then
+            echo "无日志可回传"; exit 0
+          fi
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -p "$DEPLOY_PORT" -t rsa "$DEPLOY_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
+          scp -P "$DEPLOY_PORT" /tmp/build.log "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_DIR/build-error.log" || true
