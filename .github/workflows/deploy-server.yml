@@ -58,10 +58,10 @@ jobs:
             printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa
             ssh-keyscan -p "$DEPLOY_PORT" -t rsa "$DEPLOY_HOST" >> ~/.ssh/known_hosts 2>/dev/null
             echo "--- ssh test ---" >> /tmp/hb.log
-            ssh -p "$DEPLOY_PORT" -o BatchMode=yes -o ConnectTimeout=15 -o StrictHostKeyChecking=accept-new \
+            ssh -i ~/.ssh/id_rsa -p "$DEPLOY_PORT" -o BatchMode=yes -o ConnectTimeout=15 -o StrictHostKeyChecking=accept-new \
               "$DEPLOY_USER@$DEPLOY_HOST" 'echo SSH_OK; whoami; pwd; ls -la ~/deploy_preview.sh' >> /tmp/hb.log 2>&1
             echo "ssh_exit=$?" >> /tmp/hb.log
-            scp -o StrictHostKeyChecking=accept-new -P "$DEPLOY_PORT" /tmp/hb.log "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_DIR/ci-heartbeat.log" >> /tmp/hb.log 2>&1
+            scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=accept-new -P "$DEPLOY_PORT" /tmp/hb.log "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_DIR/ci-heartbeat.log" >> /tmp/hb.log 2>&1
             echo "scp_exit=$?" >> /tmp/hb.log
           fi
           cat /tmp/hb.log
@@ -135,11 +135,11 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -p "$DEPLOY_PORT" -t rsa "$DEPLOY_HOST" >> ~/.ssh/known_hosts 2>/dev/null
           if [ "$TARGET" = "live" ]; then
-            scp -o StrictHostKeyChecking=accept-new -P "$DEPLOY_PORT" homepage.tar.gz "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_DIR/" 2>&1 | tee /tmp/deploy.log
-            ssh -p "$DEPLOY_PORT" -o StrictHostKeyChecking=accept-new "$DEPLOY_USER@$DEPLOY_HOST" "~/deploy_homepage.sh" 2>&1 | tee -a /tmp/deploy.log
+            scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=accept-new -P "$DEPLOY_PORT" homepage.tar.gz "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_DIR/" 2>&1 | tee /tmp/deploy.log
+            ssh -i ~/.ssh/id_rsa -p "$DEPLOY_PORT" -o StrictHostKeyChecking=accept-new "$DEPLOY_USER@$DEPLOY_HOST" "~/deploy_homepage.sh" 2>&1 | tee -a /tmp/deploy.log
           else
-            scp -o StrictHostKeyChecking=accept-new -P "$DEPLOY_PORT" homepage_preview.tar.gz "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_DIR/" 2>&1 | tee /tmp/deploy.log
-            ssh -p "$DEPLOY_PORT" -o StrictHostKeyChecking=accept-new "$DEPLOY_USER@$DEPLOY_HOST" "~/deploy_preview.sh" 2>&1 | tee -a /tmp/deploy.log
+            scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=accept-new -P "$DEPLOY_PORT" homepage_preview.tar.gz "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_DIR/" 2>&1 | tee /tmp/deploy.log
+            ssh -i ~/.ssh/id_rsa -p "$DEPLOY_PORT" -o StrictHostKeyChecking=accept-new "$DEPLOY_USER@$DEPLOY_HOST" "~/deploy_preview.sh" 2>&1 | tee -a /tmp/deploy.log
           fi
           ssh -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "curl -s -o /dev/null -w 'preview_http=%{http_code}\n' https://jianke-yu.online/preview/ || true" 2>&1 | tee -a /tmp/deploy.log
 
