@@ -130,6 +130,19 @@ jobs:
           du -sh public | tee -a /tmp/build.log
           find public -type f | wc -l | tee -a /tmp/build.log
 
+      - name: Generate search index (Pagefind)
+        id: pagefind
+        run: |
+          if [ -f package.json ] && grep -q pagefind package.json; then
+            pnpm run pagefind 2>&1 | tee -a /tmp/build.log
+          else
+            npx --yes pagefind --site public 2>&1 | tee -a /tmp/build.log
+          fi
+          echo "--- pagefind 产物 ---" | tee -a /tmp/build.log
+          ls public/pagefind 2>/dev/null | head -5 | tee -a /tmp/build.log
+          test -f public/pagefind/pagefind.js || { echo "::error::搜索索引未生成"; exit 1; }
+          echo "索引文件数: $(find public/pagefind -type f | wc -l)" | tee -a /tmp/build.log
+
       - name: Pack static files
         id: pack
         run: |
@@ -186,6 +199,7 @@ jobs:
             echo "--- 步骤结果 ---"
             echo "target_resolve=${{ steps.target.outcome }}"
             echo "build=${{ steps.build.outcome }}"
+            echo "pagefind=${{ steps.pagefind.outcome }}"
             echo "pack=${{ steps.pack.outcome }}"
             echo "deploy=${{ steps.deploy.outcome }}"
           } > status.txt
