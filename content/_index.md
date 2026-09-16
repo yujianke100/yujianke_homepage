@@ -107,7 +107,7 @@ sections:
 
         **Teaching**
 
-        - Guest Lecturer, *43023 Emerging Topics in Artificial Intelligence*, University of Technology Sydney, Spring 2025
+        - Guest Lecturer, *43023 Emerging Topics in Artificial Intelligence*, University of Technology Sydney, Spring session 2025 (July–October)
         - Teaching Assistant, *COMP9311 Database Systems*, UNSW Sydney, Term 3 2023
         - Teaching Assistant, *DATA1001 Introduction to Data Science*, UNSW Sydney, Term 2 2024 & Term 2 2025
 

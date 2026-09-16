@@ -93,10 +93,11 @@ experience:
       learning-based database algorithms.
   - role: Guest Lecturer
     org: University of Technology Sydney
-    start: 2025-01-01
-    end: 2025-12-31
+    start: 2025-07-28
+    end: 2025-10-24
     summary: |
-      Guest lecturer for UTS 43023 Emerging Topics in AI (Spring 2025).
+      Guest lecturer for UTS 43023 Emerging Topics in AI (Spring session 2025:
+      28 July – 24 October; UTS "Spring session" runs in the second half of the year).
   - role: Research Intern
     org: DAMO Academy / Alibaba Cloud, Alibaba Group
     start: 2022-07-18
