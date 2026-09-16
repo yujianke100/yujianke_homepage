@@ -62,12 +62,12 @@ LABELS: dict[str, dict[str, str]] = {
         "keywords": "Keywords:",
         "education": "Education",
         "appointments": "Appointments & Experience",
-        "publications": "Publications",
+        "publications": "Selected Publications (first-author CCF-A)",
         "talks": "Invited Talks",
         "honors": "Honors & Awards",
         "service": "Academic Service",
         "teaching": "Teaching",
-        "skills": "Skills & Languages",
+        "skills": "Skills",
         "first_author": "1st author",
         "updated": "Updated",
         "full_list": "Full list",
@@ -82,12 +82,12 @@ LABELS: dict[str, dict[str, str]] = {
         "keywords": "关键词：",
         "education": "教育经历",
         "appointments": "工作与科研经历",
-        "publications": "论文发表",
+        "publications": "代表性论文（第一作者 CCF-A）",
         "talks": "学术报告",
         "honors": "荣誉与奖励",
         "service": "学术服务",
         "teaching": "教学工作",
-        "skills": "技能与语言",
+        "skills": "技能",
         "first_author": "第一作者",
         "updated": "更新于",
         "full_list": "完整列表",
@@ -204,20 +204,40 @@ def load_publications() -> list[dict]:
 
 
 def pub_stats(items: list[dict]) -> dict:
+    def has(item: dict, prefix: str) -> bool:
+        return any(b.startswith(prefix) for b in item["badges"])
+
     journals = sum(1 for i in items if i.get("folder") == "journal-article")
     conferences = sum(1 for i in items if i.get("folder") == "conference-paper")
-    first_author = sum(1 for i in items if i["position"] == 1)
-    ccf_a = sum(1 for i in items if any("CCF-A" in b for b in i["badges"]))
-    citations = sum(int(i["cited_by"] or 0) for i in items)
     return {
         "total": len(items),
         "journals": journals,
         "conferences": conferences,
         "others": len(items) - journals - conferences,
-        "first_author": first_author,
-        "ccf_a": ccf_a,
-        "citations": citations,
+        "first_author": sum(1 for i in items if i["position"] == 1),
+        "ccf_a": sum(1 for i in items if has(i, "CCF-A")),
+        "ccf_b": sum(1 for i in items if has(i, "CCF-B")),
+        "ccf_c": sum(1 for i in items if has(i, "CCF-C")),
+        "q1": sum(1 for i in items if has(i, "JCR Q1")),
+        "citations": sum(int(i["cited_by"] or 0) for i in items),
     }
+
+
+def pub_summary(stats: dict, lang: str) -> str:
+    """数量统计行：只讲 CCF 与 SCI 论文数量（用户要求）。"""
+    if lang == "zh":
+        return (
+            f"总体：同行评审论文 {stats['total']} 篇（SCI 期刊 {stats['journals']} 篇，"
+            f"其中 JCR Q1 {stats['q1']} 篇；会议 {stats['conferences']} 篇）—— "
+            f"CCF-A {stats['ccf_a']} 篇、CCF-B {stats['ccf_b']} 篇、CCF-C {stats['ccf_c']} 篇；"
+            f"第一作者 {stats['first_author']} 篇；总被引 {stats['citations']} 次。"
+        )
+    return (
+        f"Overall: {stats['total']} peer-reviewed papers ({stats['journals']} SCI journal papers, "
+        f"{stats['q1']} in JCR Q1; {stats['conferences']} conference papers) — "
+        f"{stats['ccf_a']} CCF-A, {stats['ccf_b']} CCF-B, {stats['ccf_c']} CCF-C; "
+        f"{stats['first_author']} as first author; {stats['citations']} citations."
+    )
 
 
 # ---------------------------------------------------------------- content
@@ -242,15 +262,24 @@ def content_en() -> dict:
         }
         for i in me.get("education") or []
     ]
-    experience = [
-        {
-            "t": clean(i.get("role")),
-            "s": clean(i.get("org")),
-            "w": fmt_period(i.get("start"), i.get("end"), present),
-            "n": clean(i.get("summary")),
-        }
-        for i in me.get("experience") or []
-    ]
+    experience = []
+    for item in me.get("experience") or []:
+        start = item.get("start")
+        if start and not item.get("end"):
+            # 起效日在未来（尚未入职的单位）不进简历
+            try:
+                if datetime.strptime(str(start)[:10], "%Y-%m-%d") > datetime.now():
+                    continue
+            except ValueError:
+                pass
+        experience.append(
+            {
+                "t": clean(item.get("role")),
+                "s": clean(item.get("org")),
+                "w": fmt_period(start, item.get("end"), present),
+                "n": clean(item.get("summary")),
+            }
+        )
     awards = []
     for i in me.get("awards") or []:
         note = clean(i.get("summary"))
@@ -344,24 +373,25 @@ def content_zh() -> dict:
 
 
 # ---------------------------------------------------------------- rendering
+# 配色参照 RenderCV 的主题约定：正文用近黑（不用灰），主色只给姓名/小标题/链接/徽章；
+# 日期、机构等次级信息用深灰 #2c353d，页脚等三级信息用 #47515c —— 都保证打印清晰。
 CSS = """
 @page { size: A4; margin: 11mm 13mm 10mm; }
 * { box-sizing: border-box; }
 html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 :root {
-  --navy: #123c69; --ink: #1c2126; --muted: #5b6779; --soft: #8794a5;
-  --rule: #ccd8e6; --tint: #f2f7fc; --hair: #e3eaf3;
+  --navy: #0b3d69; --ink: #111418; --ink-2: #2c353d; --ink-3: #47515c;
+  --rule: #b6c4d4; --hair: #dbe3ec; --tint: #eef4fa;
 }
 body {
   margin: 0 auto; background: #eef1f5; color: var(--ink);
-  font-family: "Noto Sans", "Liberation Sans", Arial, sans-serif;
-  font-size: 9.15pt; line-height: 1.33;
+  font-family: Inter, "Noto Sans", "Liberation Sans", Arial, sans-serif;
+  font-size: 9.9pt; line-height: 1.4;
 }
 body[data-lang="zh-CN"] {
-  font-family: "Noto Serif CJK SC", "Noto Serif SC", serif; line-height: 1.46;
+  font-family: "Noto Sans CJK SC", "Noto Sans SC", Inter, sans-serif;
+  font-size: 10pt; line-height: 1.6;
 }
-body[data-lang="zh-CN"] h1, body[data-lang="zh-CN"] h2,
-body[data-lang="zh-CN"] .t, body[data-lang="zh-CN"] .skill .k { font-family: "Noto Sans CJK SC", "Noto Sans SC", sans-serif; }
 .sheet {
   width: 210mm; min-height: 297mm; margin: 9mm auto; padding: 12mm 14mm 10mm;
   background: #fff; box-shadow: 0 3px 18px rgba(15, 25, 40, .14);
@@ -370,74 +400,75 @@ a { color: var(--navy); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
 /* ---------- header ---------- */
-header { display: flex; gap: 13px; align-items: flex-start; padding-bottom: 6px; border-bottom: 2px solid var(--navy); }
+header { display: flex; gap: 14px; align-items: flex-start; padding-bottom: 7px; border-bottom: 2.2px solid var(--navy); }
 .photo img { width: 23.6mm; height: 31.5mm; object-fit: cover; display: block; border: 1px solid var(--rule); border-radius: 1.5px; }
 .who { flex: 1 1 auto; min-width: 0; }
-h1 { margin: 0; font-size: 19.5pt; line-height: 1.14; color: var(--navy); letter-spacing: .2px; }
-h1 .alt { font-size: 11.5pt; font-weight: 500; color: #41505f; margin-left: 8px; letter-spacing: 0; }
-.role { font-size: 10.3pt; font-weight: 600; color: var(--navy); margin-top: 2px; }
-.where { font-size: 9pt; color: var(--soft); margin-top: 1px; }
-.contact { margin-top: 5px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px 10px; font-size: 8.8pt; }
-.contact span { color: #3b4a5c; overflow-wrap: anywhere; }
-.contact .k { color: var(--soft); margin-right: 3px; }
+h1 { margin: 0; font-size: 21pt; line-height: 1.14; color: var(--navy); font-weight: 700; letter-spacing: .1px; }
+h1 .alt { font-size: 12pt; font-weight: 500; color: var(--ink-2); margin-left: 9px; letter-spacing: 0; }
+.role { font-size: 10.8pt; font-weight: 600; color: var(--navy); margin-top: 2.5px; }
+.where { font-size: 9.6pt; color: var(--ink-3); margin-top: 1px; }
+.contact { margin-top: 5.5px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.5px 10px; font-size: 9.4pt; }
+.contact span { color: var(--ink); overflow-wrap: anywhere; }
+.contact .k { color: var(--ink-3); margin-right: 3px; }
 
 /* ---------- sections ---------- */
 h2 {
-  display: flex; align-items: center; gap: 6px; margin: 7.5px 0 4px;
-  font-size: 10.05pt; font-weight: 700; letter-spacing: .9px; color: var(--navy);
+  display: flex; align-items: center; gap: 7px; margin: 8.5px 0 4.5px;
+  font-size: 11pt; font-weight: 700; letter-spacing: 1px; color: var(--navy);
   text-transform: uppercase; page-break-after: avoid; break-after: avoid;
 }
-h2 .bar { width: 3px; height: 10.5px; background: var(--navy); border-radius: 1px; }
+h2 .bar { width: 3.5px; height: 11.5px; background: var(--navy); border-radius: 1px; }
 h2 .rule { flex: 1 1 auto; height: 1px; background: var(--rule); }
-body[data-lang="zh-CN"] h2 { font-size: 10.4pt; letter-spacing: .5px; text-transform: none; margin: 6.5px 0 3.5px; }
+body[data-lang="zh-CN"] h2 { font-size: 11.4pt; letter-spacing: .5px; text-transform: none; margin: 7.5px 0 4px; }
 
-.entry { margin-bottom: 3.4px; page-break-inside: avoid; break-inside: avoid; }
+.entry { margin-bottom: 4px; page-break-inside: avoid; break-inside: avoid; }
 .entry .row { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
-.entry .t { font-weight: 700; }
-.entry .s { color: var(--muted); font-weight: 400; }
-.entry .w { color: #3b4a5c; white-space: nowrap; font-variant-numeric: tabular-nums; }
-.entry .n { color: var(--muted); font-size: 9.05pt; margin-top: .6px; }
+.entry .t { font-weight: 700; color: var(--ink); }
+.entry .s { color: var(--ink-2); font-weight: 400; }
+.entry .w { color: var(--ink-2); font-weight: 500; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.entry .n { color: var(--ink-2); font-size: 9.7pt; margin-top: .8px; }
 
-.pubstats { font-size: 9pt; color: var(--muted); margin: 0 0 5px; }
+.pubstats { font-size: 9.6pt; color: var(--ink-2); margin: 0 0 5.5px; }
 .pubs { list-style: none; margin: 0; padding: 0; }
 /* 悬挂缩进：编号绝对定位在最左（不能用 flex —— 行内的 venue/badge 会被拆成 flex item；
-   也不能用负 text-indent —— Chrome 打印时会把后续行的 inine-block 徽章叠在一起） */
-.pubs li { position: relative; padding-left: 28px; margin-bottom: 2.9px; page-break-inside: avoid; break-inside: avoid; }
+   也不能用负 text-indent —— Chrome 打印时会把后续行的 inline-block 徽章叠在文字上） */
+.pubs li { position: relative; padding-left: 30px; margin-bottom: 3.6px; page-break-inside: avoid; break-inside: avoid; }
 .pubs li .num { position: absolute; left: 0; top: 0; color: var(--navy); font-weight: 700; }
-.venue { font-style: italic; }
+.venue { font-style: italic; color: var(--ink-2); }
 .badge {
-  display: inline-block; font-size: 7.4pt; font-weight: 600; line-height: 1.5;
-  border: 1px solid #c3d2e3; background: var(--tint); color: var(--navy);
-  border-radius: 9px; padding: 0 5px; margin-left: 4px; white-space: nowrap;
+  display: inline-block; font-size: 7.9pt; font-weight: 600; line-height: 1.55;
+  border: 1px solid #a8bcd2; background: var(--tint); color: var(--navy);
+  border-radius: 9px; padding: 0 5.5px; margin-left: 4px; white-space: nowrap;
 }
 .badge.fa { background: var(--navy); border-color: var(--navy); color: #fff; }
 .badge.ccf { border-color: var(--navy); background: #fff; color: var(--navy); font-weight: 700; }
 
 .cols { display: grid; grid-template-columns: 1fr 1fr; column-gap: 16px; }
 .cols > div + div { border-left: 1px solid var(--hair); padding-left: 16px; }
-.w-inline { color: var(--soft); font-size: 8.8pt; white-space: nowrap; }
+.w-inline { color: var(--ink-2); font-size: 9.4pt; white-space: nowrap; }
 
-.skill { display: grid; grid-template-columns: 74px 1fr; gap: 8px; margin-bottom: 2.5px; }
-body[data-lang="zh-CN"] .skill { grid-template-columns: 66px 1fr; }
+.skill { display: grid; grid-template-columns: 84px 1fr; gap: 8px; margin-bottom: 3px; }
+body[data-lang="zh-CN"] .skill { grid-template-columns: 72px 1fr; }
 .skill .k { font-weight: 700; color: var(--navy); }
 
 .foot {
-  margin-top: 10px; padding-top: 5px; border-top: 1px solid var(--hair);
+  margin-top: 11px; padding-top: 5px; border-top: 1px solid var(--hair);
   display: flex; justify-content: space-between; gap: 10px;
-  color: var(--soft); font-size: 8.1pt;
+  color: var(--ink-3); font-size: 8.8pt;
 }
+.page-break { break-before: page; page-break-before: always; }
 
 /* ---------- toolbar (screen only) ---------- */
 .toolbar {
   position: fixed; top: 10px; right: 12px; display: flex; gap: 8px; z-index: 9;
-  font-family: "Noto Sans", "Noto Sans CJK SC", Arial, sans-serif; font-size: 9pt;
+  font-family: Inter, "Noto Sans", "Noto Sans CJK SC", Arial, sans-serif; font-size: 9pt;
 }
 .toolbar button, .toolbar a {
   border: 1px solid var(--navy); color: var(--navy); background: #fff;
   border-radius: 5px; padding: 4px 10px; cursor: pointer; font: inherit; line-height: 1.6;
 }
 @media print {
-  body { background: #fff; font-size: 9.5pt; }
+  body { background: #fff; font-size: 10pt; }
   .sheet { width: auto; min-height: 0; margin: 0; padding: 0; box-shadow: none; }
   .toolbar { display: none !important; }
   a { color: inherit; }
@@ -479,27 +510,23 @@ def pubs_block(cfg: dict, lang: str) -> str:
     items = load_publications()
     if not cfg.get("include_preprints", False):
         items = [i for i in items if i["folder"] != "preprint" and "preprint" not in i["types"]]
-    if cfg.get("featured_first", True):
-        ordered = sorted(items, key=lambda i: (not i["featured"], -int(i["year"] or 0)))
+
+    # 列哪些论文：mode = first_author_ccf_a（只列一作 CCF-A）/ first_author / all
+    mode = str(cfg.get("mode", "all"))
+    if mode == "first_author_ccf_a":
+        ordered = [i for i in items if i["position"] == 1 and any(b.startswith("CCF-A") for b in i["badges"])]
+    elif mode == "first_author":
+        ordered = [i for i in items if i["position"] == 1]
     else:
-        ordered = sorted(items, key=lambda i: -int(i["year"] or 0))
+        ordered = list(items)
+    if cfg.get("featured_first", True):
+        ordered = sorted(ordered, key=lambda i: (not i["featured"], -int(i["year"] or 0)))
+    else:
+        ordered = sorted(ordered, key=lambda i: -int(i["year"] or 0))
     ordered = ordered[: int(cfg.get("max_items", 20))]
 
-    stats = pub_stats(items)
-    if lang == "zh":
-        extra = f"，另有其他类型 {stats['others']} 篇" if stats["others"] else ""
-        summary = (
-            f"同行评审论文 {stats['total']} 篇（期刊 {stats['journals']} 篇、"
-            f"会议 {stats['conferences']} 篇）{extra}，第一作者 {stats['first_author']} 篇，"
-            f"CCF-A 类 {stats['ccf_a']} 篇，总被引 {stats['citations']} 次。"
-        )
-    else:
-        extra = f", {stats['others']} other" if stats["others"] else ""
-        summary = (
-            f"{stats['total']} peer-reviewed papers ({stats['journals']} journal, "
-            f"{stats['conferences']} conference{extra}), {stats['first_author']} as first author, "
-            f"{stats['ccf_a']} CCF-A, {stats['citations']} citations."
-        )
+    # 统计行永远统计全部同行评审论文（不受上面的筛选影响）
+    summary = pub_summary(pub_stats(items), lang)
 
     rows = []
     for idx, item in enumerate(ordered, start=1):
@@ -540,9 +567,7 @@ def build_html(lang: str) -> str:
         f'<div class="skill"><div class="k">{esc(s["k"])}</div><div>{esc(s["v"])}</div></div>'
         for s in data["skills"]
     )
-    if data["languages"]:
-        lang_key = "语言" if lang == "zh" else "Languages"
-        skills += f'\n<div class="skill"><div class="k">{lang_key}</div><div>{esc(data["languages"])}</div></div>'
+    page_break = '<div class="page-break"></div>' if data["pub_cfg"].get("page_break_before") else ""
 
     return f"""<!DOCTYPE html>
 <!-- GENERATED by scripts/build_cv.py ({lang}) — 请勿手工编辑。
@@ -584,9 +609,9 @@ def build_html(lang: str) -> str:
   {h2(labels["appointments"])}
   {entries_html(data["experience"])}
 
+  {page_break}
   {h2(labels["publications"])}
   {pubs_block(data["pub_cfg"], lang)}
-
   {h2(labels["talks"])}
   {entries_html(data["talks"])}
 

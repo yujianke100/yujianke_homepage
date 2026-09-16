@@ -58,9 +58,6 @@ education:
     when: 2016.09 – 2020.06
 
 experience:
-  - title: 教学科研岗（人才引进）
-    sub: 浙江工商大学
-    when: 2027.03 入职
   - title: 研究实习生
     sub: 阿里巴巴集团 · Token Foundry, Alibaba Token Hub
     when: 2025.12 – 至今

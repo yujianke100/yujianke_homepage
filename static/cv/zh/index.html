@@ -14,19 +14,18 @@
 * { box-sizing: border-box; }
 html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 :root {
-  --navy: #123c69; --ink: #1c2126; --muted: #5b6779; --soft: #8794a5;
-  --rule: #ccd8e6; --tint: #f2f7fc; --hair: #e3eaf3;
+  --navy: #0b3d69; --ink: #111418; --ink-2: #2c353d; --ink-3: #47515c;
+  --rule: #b6c4d4; --hair: #dbe3ec; --tint: #eef4fa;
 }
 body {
   margin: 0 auto; background: #eef1f5; color: var(--ink);
-  font-family: "Noto Sans", "Liberation Sans", Arial, sans-serif;
-  font-size: 9.15pt; line-height: 1.33;
+  font-family: Inter, "Noto Sans", "Liberation Sans", Arial, sans-serif;
+  font-size: 9.9pt; line-height: 1.4;
 }
 body[data-lang="zh-CN"] {
-  font-family: "Noto Serif CJK SC", "Noto Serif SC", serif; line-height: 1.46;
+  font-family: "Noto Sans CJK SC", "Noto Sans SC", Inter, sans-serif;
+  font-size: 10pt; line-height: 1.6;
 }
-body[data-lang="zh-CN"] h1, body[data-lang="zh-CN"] h2,
-body[data-lang="zh-CN"] .t, body[data-lang="zh-CN"] .skill .k { font-family: "Noto Sans CJK SC", "Noto Sans SC", sans-serif; }
 .sheet {
   width: 210mm; min-height: 297mm; margin: 9mm auto; padding: 12mm 14mm 10mm;
   background: #fff; box-shadow: 0 3px 18px rgba(15, 25, 40, .14);
@@ -35,74 +34,75 @@ a { color: var(--navy); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
 /* ---------- header ---------- */
-header { display: flex; gap: 13px; align-items: flex-start; padding-bottom: 6px; border-bottom: 2px solid var(--navy); }
+header { display: flex; gap: 14px; align-items: flex-start; padding-bottom: 7px; border-bottom: 2.2px solid var(--navy); }
 .photo img { width: 23.6mm; height: 31.5mm; object-fit: cover; display: block; border: 1px solid var(--rule); border-radius: 1.5px; }
 .who { flex: 1 1 auto; min-width: 0; }
-h1 { margin: 0; font-size: 19.5pt; line-height: 1.14; color: var(--navy); letter-spacing: .2px; }
-h1 .alt { font-size: 11.5pt; font-weight: 500; color: #41505f; margin-left: 8px; letter-spacing: 0; }
-.role { font-size: 10.3pt; font-weight: 600; color: var(--navy); margin-top: 2px; }
-.where { font-size: 9pt; color: var(--soft); margin-top: 1px; }
-.contact { margin-top: 5px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px 10px; font-size: 8.8pt; }
-.contact span { color: #3b4a5c; overflow-wrap: anywhere; }
-.contact .k { color: var(--soft); margin-right: 3px; }
+h1 { margin: 0; font-size: 21pt; line-height: 1.14; color: var(--navy); font-weight: 700; letter-spacing: .1px; }
+h1 .alt { font-size: 12pt; font-weight: 500; color: var(--ink-2); margin-left: 9px; letter-spacing: 0; }
+.role { font-size: 10.8pt; font-weight: 600; color: var(--navy); margin-top: 2.5px; }
+.where { font-size: 9.6pt; color: var(--ink-3); margin-top: 1px; }
+.contact { margin-top: 5.5px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.5px 10px; font-size: 9.4pt; }
+.contact span { color: var(--ink); overflow-wrap: anywhere; }
+.contact .k { color: var(--ink-3); margin-right: 3px; }
 
 /* ---------- sections ---------- */
 h2 {
-  display: flex; align-items: center; gap: 6px; margin: 7.5px 0 4px;
-  font-size: 10.05pt; font-weight: 700; letter-spacing: .9px; color: var(--navy);
+  display: flex; align-items: center; gap: 7px; margin: 8.5px 0 4.5px;
+  font-size: 11pt; font-weight: 700; letter-spacing: 1px; color: var(--navy);
   text-transform: uppercase; page-break-after: avoid; break-after: avoid;
 }
-h2 .bar { width: 3px; height: 10.5px; background: var(--navy); border-radius: 1px; }
+h2 .bar { width: 3.5px; height: 11.5px; background: var(--navy); border-radius: 1px; }
 h2 .rule { flex: 1 1 auto; height: 1px; background: var(--rule); }
-body[data-lang="zh-CN"] h2 { font-size: 10.4pt; letter-spacing: .5px; text-transform: none; margin: 6.5px 0 3.5px; }
+body[data-lang="zh-CN"] h2 { font-size: 11.4pt; letter-spacing: .5px; text-transform: none; margin: 7.5px 0 4px; }
 
-.entry { margin-bottom: 3.4px; page-break-inside: avoid; break-inside: avoid; }
+.entry { margin-bottom: 4px; page-break-inside: avoid; break-inside: avoid; }
 .entry .row { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
-.entry .t { font-weight: 700; }
-.entry .s { color: var(--muted); font-weight: 400; }
-.entry .w { color: #3b4a5c; white-space: nowrap; font-variant-numeric: tabular-nums; }
-.entry .n { color: var(--muted); font-size: 9.05pt; margin-top: .6px; }
+.entry .t { font-weight: 700; color: var(--ink); }
+.entry .s { color: var(--ink-2); font-weight: 400; }
+.entry .w { color: var(--ink-2); font-weight: 500; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.entry .n { color: var(--ink-2); font-size: 9.7pt; margin-top: .8px; }
 
-.pubstats { font-size: 9pt; color: var(--muted); margin: 0 0 5px; }
+.pubstats { font-size: 9.6pt; color: var(--ink-2); margin: 0 0 5.5px; }
 .pubs { list-style: none; margin: 0; padding: 0; }
 /* 悬挂缩进：编号绝对定位在最左（不能用 flex —— 行内的 venue/badge 会被拆成 flex item；
-   也不能用负 text-indent —— Chrome 打印时会把后续行的 inine-block 徽章叠在一起） */
-.pubs li { position: relative; padding-left: 28px; margin-bottom: 2.9px; page-break-inside: avoid; break-inside: avoid; }
+   也不能用负 text-indent —— Chrome 打印时会把后续行的 inline-block 徽章叠在文字上） */
+.pubs li { position: relative; padding-left: 30px; margin-bottom: 3.6px; page-break-inside: avoid; break-inside: avoid; }
 .pubs li .num { position: absolute; left: 0; top: 0; color: var(--navy); font-weight: 700; }
-.venue { font-style: italic; }
+.venue { font-style: italic; color: var(--ink-2); }
 .badge {
-  display: inline-block; font-size: 7.4pt; font-weight: 600; line-height: 1.5;
-  border: 1px solid #c3d2e3; background: var(--tint); color: var(--navy);
-  border-radius: 9px; padding: 0 5px; margin-left: 4px; white-space: nowrap;
+  display: inline-block; font-size: 7.9pt; font-weight: 600; line-height: 1.55;
+  border: 1px solid #a8bcd2; background: var(--tint); color: var(--navy);
+  border-radius: 9px; padding: 0 5.5px; margin-left: 4px; white-space: nowrap;
 }
 .badge.fa { background: var(--navy); border-color: var(--navy); color: #fff; }
 .badge.ccf { border-color: var(--navy); background: #fff; color: var(--navy); font-weight: 700; }
 
 .cols { display: grid; grid-template-columns: 1fr 1fr; column-gap: 16px; }
 .cols > div + div { border-left: 1px solid var(--hair); padding-left: 16px; }
-.w-inline { color: var(--soft); font-size: 8.8pt; white-space: nowrap; }
+.w-inline { color: var(--ink-2); font-size: 9.4pt; white-space: nowrap; }
 
-.skill { display: grid; grid-template-columns: 74px 1fr; gap: 8px; margin-bottom: 2.5px; }
-body[data-lang="zh-CN"] .skill { grid-template-columns: 66px 1fr; }
+.skill { display: grid; grid-template-columns: 84px 1fr; gap: 8px; margin-bottom: 3px; }
+body[data-lang="zh-CN"] .skill { grid-template-columns: 72px 1fr; }
 .skill .k { font-weight: 700; color: var(--navy); }
 
 .foot {
-  margin-top: 10px; padding-top: 5px; border-top: 1px solid var(--hair);
+  margin-top: 11px; padding-top: 5px; border-top: 1px solid var(--hair);
   display: flex; justify-content: space-between; gap: 10px;
-  color: var(--soft); font-size: 8.1pt;
+  color: var(--ink-3); font-size: 8.8pt;
 }
+.page-break { break-before: page; page-break-before: always; }
 
 /* ---------- toolbar (screen only) ---------- */
 .toolbar {
   position: fixed; top: 10px; right: 12px; display: flex; gap: 8px; z-index: 9;
-  font-family: "Noto Sans", "Noto Sans CJK SC", Arial, sans-serif; font-size: 9pt;
+  font-family: Inter, "Noto Sans", "Noto Sans CJK SC", Arial, sans-serif; font-size: 9pt;
 }
 .toolbar button, .toolbar a {
   border: 1px solid var(--navy); color: var(--navy); background: #fff;
   border-radius: 5px; padding: 4px 10px; cursor: pointer; font: inherit; line-height: 1.6;
 }
 @media print {
-  body { background: #fff; font-size: 9.5pt; }
+  body { background: #fff; font-size: 10pt; }
   .sheet { width: auto; min-height: 0; margin: 0; padding: 0; box-shadow: none; }
   .toolbar { display: none !important; }
   a { color: inherit; }
@@ -136,37 +136,21 @@ body[data-lang="zh-CN"] .skill { grid-template-columns: 66px 1fr; }
 <div class="entry"><div class="row"><div class="t">学士，电子信息工程<span class="s"> · 浙江工商大学</span></div><div class="w">2016.09 – 2020.06</div></div></div>
 
   <h2><span class="bar"></span>工作与科研经历<span class="rule"></span></h2>
-  <div class="entry"><div class="row"><div class="t">教学科研岗（人才引进）<span class="s"> · 浙江工商大学</span></div><div class="w">2027.03 入职</div></div></div>
-<div class="entry"><div class="row"><div class="t">研究实习生<span class="s"> · 阿里巴巴集团 · Token Foundry, Alibaba Token Hub</span></div><div class="w">2025.12 – 至今</div></div><div class="n">面向工业数据系统的图学习方法研究。</div></div>
+  <div class="entry"><div class="row"><div class="t">研究实习生<span class="s"> · 阿里巴巴集团 · Token Foundry, Alibaba Token Hub</span></div><div class="w">2025.12 – 至今</div></div><div class="n">面向工业数据系统的图学习方法研究。</div></div>
 <div class="entry"><div class="row"><div class="t">研究助理<span class="s"> · 悉尼科技大学</span></div><div class="w">2023.07 – 至今</div></div><div class="n">ARC Discovery Project。图神经网络、图相似性检索与学习型数据库算法。</div></div>
 <div class="entry"><div class="row"><div class="t">客座讲师<span class="s"> · 悉尼科技大学</span></div><div class="w">2025.01 – 2025.12</div></div><div class="n">讲授 43023 Emerging Topics in Artificial Intelligence（2025 年春季学期）。</div></div>
 <div class="entry"><div class="row"><div class="t">研究实习生<span class="s"> · 阿里巴巴集团 · 达摩院 / 阿里云</span></div><div class="w">2022.07 – 2023.04</div></div><div class="n">电商平台欺诈检测（相关成果发表于 KDD 2023 与 IEEE TKDE）。</div></div>
 <div class="entry"><div class="row"><div class="t">研究实习生<span class="s"> · 阿里巴巴集团 · 淘宝</span></div><div class="w">2021.11 – 2022.03</div></div><div class="n">基于图的用户建模与风险分析。</div></div>
 
-  <h2><span class="bar"></span>论文发表<span class="rule"></span></h2>
-  <div class="pubstats">同行评审论文 19 篇（期刊 10 篇、会议 9 篇），第一作者 6 篇，CCF-A 类 7 篇，总被引 119 次。</div>
+  
+  <h2><span class="bar"></span>代表性论文（第一作者 CCF-A）<span class="rule"></span></h2>
+  <div class="pubstats">总体：同行评审论文 19 篇（SCI 期刊 10 篇，其中 JCR Q1 5 篇；会议 9 篇）—— CCF-A 7 篇、CCF-B 6 篇、CCF-C 4 篇；第一作者 6 篇；总被引 119 次。</div>
 <ul class="pubs">
 <li><span class="num">[1]</span>MGDN: A Graph of Graphs Neural Network for Malware Detection. <span class="venue">IEEE Transactions on Knowledge and Data Engineering</span>, 2026.<span class="badge fa">第一作者</span><span class="badge ccf">CCF-A</span><span class="badge">中科院 1 区 Top</span><span class="badge">JCR Q1</span></li>
 <li><span class="num">[2]</span>SARL: A Scalable Attribute-Informed Representation Learning Framework for Bipartite Graphs. <span class="venue">IEEE Transactions on Knowledge and Data Engineering</span>, 2026.<span class="badge fa">第一作者</span><span class="badge ccf">CCF-A</span><span class="badge">中科院 1 区 Top</span><span class="badge">JCR Q1</span></li>
 <li><span class="num">[3]</span>Temporal Insights for Group-Based Fraud Detection on e-Commerce Platforms. <span class="venue">IEEE Transactions on Knowledge and Data Engineering</span>, 2024.<span class="badge fa">第一作者</span><span class="badge ccf">CCF-A</span><span class="badge">中科院 1 区 Top</span><span class="badge">JCR Q1</span></li>
 <li><span class="num">[4]</span>Group-based Fraud Detection Network on e-Commerce Platforms. <span class="venue">ACM SIGKDD Conference on Knowledge Discovery and Data Mining</span>, 2023.<span class="badge fa">第一作者</span><span class="badge ccf">CCF-A</span></li>
-<li><span class="num">[5]</span>Mining Discriminative Salient Objects with Optimal Transport for Few-Shot Image Classification. <span class="venue">FLINS-ISKE</span>, 2026.</li>
-<li><span class="num">[6]</span>Finding critical users in social networks with reinforcement learning. <span class="venue">Information Sciences</span>, 2026.<span class="badge ccf">CCF-B</span><span class="badge">中科院 2 区</span><span class="badge">JCR Q1</span></li>
-<li><span class="num">[7]</span>AEFA: An Ensemble Framework for Fraud Detection in the Forex Market. <span class="venue">International Conference on Advanced Data Mining and Applications</span>, 2025.<span class="badge ccf">CCF-C</span></li>
-<li><span class="num">[8]</span>Deep Overlapping Community Search via Subspace Embedding. <span class="venue">ACM SIGMOD Conference</span>, 2025.<span class="badge ccf">CCF-A</span></li>
-<li><span class="num">[9]</span>RPDN: An Effective Rating Pollution Attacks Detection Framework for Recommendation Systems. <span class="venue">Pacific-Asia Conference on Knowledge Discovery and Data Mining</span>, 2025.<span class="badge ccf">CCF-C</span></li>
-<li><span class="num">[10]</span>IGFM: An Enhanced Graph Similarity Computation Method with Fine-Grained Analysis. <span class="venue">Data Science and Engineering</span>, 2025.<span class="badge ccf">CCF-B</span><span class="badge">中科院 1 区 Top</span><span class="badge">JCR Q2</span></li>
-<li><span class="num">[11]</span>RIDA: a robust attack framework on incomplete graphs. <span class="venue">World Wide Web</span>, 2025.<span class="badge fa">第一作者</span><span class="badge ccf">CCF-B</span><span class="badge">中科院 4 区</span><span class="badge">JCR Q2</span></li>
-<li><span class="num">[12]</span>Neural Similarity Search on Supergraph Containment (Extended Abstract). <span class="venue">IEEE International Conference on Data Engineering</span>, 2024.<span class="badge ccf">CCF-A</span></li>
-<li><span class="num">[13]</span>SBGMN: A Multi-view Sign Prediction Network for Bipartite Graphs. <span class="venue">Asia Pacific Web Conference (APWeb-WAIM)</span>, 2024.<span class="badge ccf">CCF-C</span></li>
-<li><span class="num">[14]</span>IFGNN: An Individual Fairness Awareness Model for Missing Sensitive Information Graphs. <span class="venue">Australasian Database Conference</span>, 2023.</li>
-<li><span class="num">[15]</span>KGNIE: A Learning Method for Estimating Node Importance in Knowledge Graphs. <span class="venue">IEEE International Conference on High Performance Computing and Communications</span>, 2023.<span class="badge ccf">CCF-C</span></li>
-<li><span class="num">[16]</span>FPGN: follower prediction framework for infectious disease prevention. <span class="venue">World Wide Web</span>, 2023.<span class="badge fa">第一作者</span><span class="badge ccf">CCF-B</span><span class="badge">中科院 4 区</span><span class="badge">JCR Q2</span></li>
-<li><span class="num">[17]</span>Neural Similarity Search on Supergraph Containment. <span class="venue">IEEE Transactions on Knowledge and Data Engineering</span>, 2023.<span class="badge ccf">CCF-A</span><span class="badge">中科院 1 区 Top</span><span class="badge">JCR Q1</span></li>
-<li><span class="num">[18]</span>Bipartite graph capsule network. <span class="venue">World Wide Web</span>, 2022.<span class="badge ccf">CCF-B</span><span class="badge">中科院 4 区</span><span class="badge">JCR Q2</span></li>
-<li><span class="num">[19]</span>Polarity-based graph neural network for sign prediction in signed bipartite graphs. <span class="venue">World Wide Web</span>, 2022.<span class="badge ccf">CCF-B</span><span class="badge">中科院 4 区</span><span class="badge">JCR Q2</span></li>
 </ul>
-
   <h2><span class="bar"></span>学术报告<span class="rule"></span></h2>
   <div class="entry"><div class="row"><div class="t">Scalable Big Data Computation<span class="s"> · 学术报告 · 香港中文大学（深圳）数据科学学院</span></div><div class="w">2026.04</div></div></div>
 
@@ -193,10 +177,9 @@ body[data-lang="zh-CN"] .skill { grid-template-columns: 66px 1fr; }
     </div>
   </div>
 
-  <h2><span class="bar"></span>技能与语言<span class="rule"></span></h2>
+  <h2><span class="bar"></span>技能<span class="rule"></span></h2>
   <div class="skill"><div class="k">技术技能</div><div>图神经网络、Python / PyTorch、图数据库与查询处理、数据挖掘与欺诈检测</div></div>
 <div class="skill"><div class="k">科研与服务</div><div>学术写作与论文发表、同行评议（IEEE TKDE）、教学与学生指导</div></div>
-<div class="skill"><div class="k">语言</div><div>中文（母语）、英语（流利）</div></div>
 
   <div class="foot">
     <span>更新于 2026-09-16</span>

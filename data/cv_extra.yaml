@@ -64,6 +64,12 @@ teaching:
 
 # 论文列表的筛选与排序
 publications:
-  max_items: 19               # 全部同行评审论文（预印本不列）；改成 12 之类即只列精选
+  # mode:
+  #   first_author_ccf_a = 只列第一作者的 CCF-A 论文（现用；数量统计行仍统计全部论文）
+  #   first_author       = 只列第一作者论文
+  #   all                = 全部同行评审论文
+  mode: first_author_ccf_a
+  max_items: 20                # 上限（mode 已筛选，一般用不到）
+  page_break_before: false     # true = 打印时"论文"强制从第 2 页开始（内容少时反而让第 1 页空一半，现关闭）
   include_preprints: false     # 预印本（arXiv）是否进简历
   featured_first: true         # 先列 selected/featured 的论文
