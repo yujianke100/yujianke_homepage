@@ -1,0 +1,13 @@
+run_id=35081653447
+event=push
+sha=fbc927459d8fffadcdac88bec72620271332063c
+target=live
+job_status=success
+time=2026-09-16 09:52:57 UTC
+TARGET=live
+--- 步骤结果 ---
+target_resolve=success
+build=success
+pagefind=success
+pack=success
+deploy=success
