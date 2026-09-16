@@ -47,8 +47,7 @@ education:
     note: |
       2026 年 9 月 9 日授予学位。导师：张颖教授、秦璐副教授、王翰宸博士。博士学位论文
       《Fraud detection on the customer-product bipartite graph》（面向图结构数据与数据库系统的
-      学习型算法）。相关成果发表于 KDD 2023 与 IEEE TKDE（2024、2025、2026）。获 UTS 工程与
-      信息技术学部 HDR 优秀奖（个人类，Distinction，2025）。
+      学习型算法）。
   - title: 硕士，电子信息
     sub: 浙江工商大学
     when: 2020.09 – 2023.06
@@ -129,11 +128,11 @@ awards:   # ← 荣誉与奖励（奖学金另列在下面的 scholarships，两
     when: 2019
 
 scholarships:   # ← 奖学金与资助
-  # ⚠️ 第 1 条的颁奖单位口径待用户确认（国家留学基金委 / 留学服务中心）
-  - title: 海外优秀留学人员奖（2025–2026）
+  # ⚠️ 颁奖单位口径待用户确认（国家留学基金委 / 教育部留学服务中心）
+  - title: 国家优秀自费留学生奖学金（2025–2026）
     sub: 国家留学基金委
     when: 2026
-    note: 面向海外优秀自费博士研究生的国家级奖励。
+    note: 面向海外优秀自费留学人员的国家级奖学金。
   - title: UTS ARC Discovery Project 奖学金（全额）
     sub: 悉尼科技大学 / 澳大利亚研究理事会
     when: 2023

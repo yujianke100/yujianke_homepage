@@ -60,11 +60,8 @@ education:
     end: 2026-09-09
     summary: |
       Conferred 9 September 2026. Supervised by Prof. Ying Zhang, A/Prof. Lu Qin and
-      Dr Hanchen Wang.
-      Thesis: "Fraud detection on the customer-product bipartite graph" (learning-based
-      algorithms for graph-structured data and database systems). Published in KDD 2023
-      and IEEE TKDE (2024, 2025, 2026). Recipient of the UTS FEIT HDR Excellence Award,
-      Individual Category, Distinction (2025).
+      Dr Hanchen Wang. Thesis: "Fraud detection on the customer-product bipartite graph"
+      (learning-based algorithms for graph-structured data and database systems).
   - degree: M.Eng, Electronic Information
     institution: Zhejiang Gongshang University
     start: 2020-09-01
@@ -142,10 +139,10 @@ languages:
     label: Fluent
 
 awards:
-  - title: Award for Outstanding Overseas Study Elite (2025–2026)
+  - title: National Award for Outstanding Self-Financed Students Abroad (2025–2026)
     awarder: China Scholarship Council
     date: "2026-01-01"
-    summary: National-level award for outstanding self-financed PhD students abroad.
+    summary: National-level award for outstanding self-financed students abroad.
     icon: hero/trophy
   - title: UTS FEIT HDR Excellence Award — Individual Category, Distinction
     awarder: University of Technology Sydney, Faculty of Engineering and IT

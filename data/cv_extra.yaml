@@ -56,9 +56,13 @@ academic_service:
 # （标题必须与 data/authors/me.yaml: awards 里的 title 完全一致，其余归入 Honors & Awards）
 awards_split:
   scholarships:
-    - "Award for Outstanding Overseas Study Elite (2025–2026)"
+    - "National Award for Outstanding Self-Financed Students Abroad (2025–2026)"
     - "UTS ARC Discovery Project Scholarship (Full Scholarship)"
     - "UTS International Research Scholarship"
+
+# 段落开关（简历上要不要显示某一段）
+sections:
+  skills: false        # 技能段（用户认为相比之下不太重要，先关闭）
 
 teaching:
   - role: "Guest Lecturer"
@@ -79,6 +83,7 @@ publications:
   #   all                = 全部同行评审论文
   mode: first_author_ccf_a
   max_items: 20                # 上限（mode 已筛选，一般用不到）
-  page_break_before: false     # true = 打印时"论文"强制从第 2 页开始（内容少时反而让第 1 页空一半，现关闭）
+  page_break_before: false     # false / 段落 key（publications、scholarships、honors、activities）/ true=publications
+                               # 用来强制某段从第 2 页开始；内容只剩约 1.5 页时，强制分页会让第 1 页空掉三分之一
   include_preprints: false     # 预印本（arXiv）是否进简历
   featured_first: true         # 先列 selected/featured 的论文
