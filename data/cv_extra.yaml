@@ -3,24 +3,32 @@
 # 为什么不写进 data/authors/me.yaml：HugoBlox 的 author schema 是 hugoblox/author/v1，
 # 未定义的键可能在站点构建时校验失败。与站点渲染无关、只给打印版简历用的内容放这里。
 #
+# 中文版简历的内容在 data/cv_zh.yaml。
+#
 # 更新后重新生成：
 #   python3 scripts/build_cv.py --pdf
 
-# 简历头部联系方式（顺序即显示顺序）
+# 简历头部联系方式（顺序即显示顺序；key 是左侧的灰色小标签）
 contact:
   location: Hangzhou, China
   items:
-    - label: yujianke100@gmail.com
+    - key: Email
+      label: yujianke100@gmail.com
       url: mailto:yujianke100@gmail.com
-    - label: jianke-yu.online
+    - key: Web
+      label: jianke-yu.online
       url: https://jianke-yu.online
-    - label: Google Scholar
+    - key: Scholar
+      label: Google Scholar
       url: https://scholar.google.com/citations?user=EwomMksAAAAJ
-    - label: ORCID
+    - key: ORCID
+      label: 0000-0002-2032-7727
       url: https://orcid.org/0000-0002-2032-7727
-    - label: DBLP
+    - key: DBLP
+      label: dblp.org/pid/316/0485
       url: https://dblp.org/pid/316/0485.html
-    - label: GitHub
+    - key: GitHub
+      label: github.com/yujianke100
       url: https://github.com/yujianke100
 
 # 研究概述（简历里 Research Interests 之上的一段）
@@ -56,6 +64,6 @@ teaching:
 
 # 论文列表的筛选与排序
 publications:
-  max_items: 14               # 简历上列出的论文数（完整列表在网站 /publications/）
+  max_items: 19               # 全部同行评审论文（预印本不列）；改成 12 之类即只列精选
   include_preprints: false     # 预印本（arXiv）是否进简历
   featured_first: true         # 先列 selected/featured 的论文

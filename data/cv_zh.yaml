@@ -1,0 +1,142 @@
+# 中文版简历数据（渲染成 /cv/zh/ 与 Jianke-Yu-CV-zh.pdf）
+#
+# 英文版内容仍在：data/authors/me.yaml + data/cv_extra.yaml。
+# 论文列表两版共用 content/publications/**（题名与期刊/会议名保留英文原文）。
+# 本文件只放"中文表述"，字段与英文版一一对应，改完重新生成：
+#   python3 scripts/build_cv.py --pdf
+
+name:
+  display: 俞鉴珂
+  alt: Jianke Yu
+  postnominal: 博士
+
+role: 图机器学习与数据库方向 · 计算机科学博士（2026）
+location: 中国 · 杭州
+
+contact:
+  - key: 邮箱
+    label: yujianke100@gmail.com
+    url: mailto:yujianke100@gmail.com
+  - key: 主页
+    label: jianke-yu.online
+    url: https://jianke-yu.online
+  - key: 学术
+    label: Google Scholar
+    url: https://scholar.google.com/citations?user=EwomMksAAAAJ
+  - key: ORCID
+    label: 0000-0002-2032-7727
+    url: https://orcid.org/0000-0002-2032-7727
+  - key: DBLP
+    label: dblp.org/pid/316/0485
+    url: https://dblp.org/pid/316/0485.html
+  - key: GitHub
+    label: github.com/yujianke100
+    url: https://github.com/yujianke100
+
+research_statement: |
+  面向图结构数据与数据库系统的机器学习方法研究：面向不完整图、属性图与动态图的图神经网络
+  结构（欺诈检测、恶意软件检测、图相似性计算），以及用于加速数据库查询与数据挖掘过程的
+  学习型算法。
+
+interests: 图神经网络、图数据库、面向数据库的 AI、欺诈检测、知识图谱
+
+education:
+  - title: 博士，信息技术
+    sub: 悉尼科技大学
+    when: 2023.07 – 2026.09
+    note: |
+      2026 年 9 月 9 日授予学位。导师：张颖教授、秦路副教授。博士学位论文
+      《Fraud detection on the customer-product bipartite graph》（面向图结构数据与数据库系统的
+      学习型算法）。相关成果发表于 KDD 2023 与 IEEE TKDE（2024、2025、2026）。获 UTS 工程与
+      信息技术学部 HDR 优秀奖（个人类，Distinction，2025）。
+  - title: 硕士，电子信息
+    sub: 浙江工商大学
+    when: 2020.09 – 2023.06
+    note: 导师：王晓阳教授。研究方向为图表征学习、欺诈检测与图相似性计算。
+  - title: 学士，电子信息工程
+    sub: 浙江工商大学
+    when: 2016.09 – 2020.06
+
+experience:
+  - title: 教学科研岗（人才引进）
+    sub: 浙江工商大学
+    when: 2027.03 入职
+  - title: 研究实习生
+    sub: 阿里巴巴集团 · Token Foundry, Alibaba Token Hub
+    when: 2025.12 – 至今
+    note: 面向工业数据系统的图学习方法研究。
+  - title: 研究助理
+    sub: 悉尼科技大学
+    when: 2023.07 – 至今
+    note: ARC Discovery Project。图神经网络、图相似性检索与学习型数据库算法。
+  - title: 客座讲师
+    sub: 悉尼科技大学
+    when: 2025.01 – 2025.12
+    note: 讲授 43023 Emerging Topics in Artificial Intelligence（2025 年春季学期）。
+  - title: 研究实习生
+    sub: 阿里巴巴集团 · 达摩院 / 阿里云
+    when: 2022.07 – 2023.04
+    note: 电商平台欺诈检测（相关成果发表于 KDD 2023 与 IEEE TKDE）。
+  - title: 研究实习生
+    sub: 阿里巴巴集团 · 淘宝
+    when: 2021.11 – 2022.03
+    note: 基于图的用户建模与风险分析。
+
+invited_talks:
+  - title: Scalable Big Data Computation
+    sub: 学术报告 · 香港中文大学（深圳）数据科学学院
+    when: 2026.04
+
+academic_service:
+  - title: 审稿人
+    sub: IEEE Transactions on Knowledge and Data Engineering (TKDE)
+    when: 2025
+  - title: 平台管理员
+    sub: 浙江工商大学 张颖教授、王晓阳教授课题组 · 科研计算平台
+    when: 2024 –
+
+teaching:
+  - title: 客座讲师
+    sub: 43023 Emerging Topics in Artificial Intelligence，悉尼科技大学
+    when: 2025 春
+  - title: 助教
+    sub: COMP9311 Database Systems，新南威尔士大学
+    when: 2023 T3
+  - title: 助教
+    sub: DATA1001 Introduction to Data Science，新南威尔士大学
+    when: 2024 T2、2025 T2
+
+skills:
+  - key: 技术技能
+    value: 图神经网络、Python / PyTorch、图数据库与查询处理、数据挖掘与欺诈检测
+  - key: 科研与服务
+    value: 学术写作与论文发表、同行评议（IEEE TKDE）、教学与学生指导
+
+languages: 中文（母语）、英语（流利）
+
+awards:
+  # ⚠️ 第 1 条的颁奖单位口径待用户确认（国家留学基金委 / 留学服务中心）
+  - title: 海外优秀留学人员奖（2025–2026）
+    sub: 国家留学基金委
+    when: 2026
+    note: 面向海外优秀自费博士研究生的国家级奖励。
+  - title: UTS FEIT HDR 优秀奖 — 个人类 · Distinction
+    sub: 悉尼科技大学 工程与信息技术学部
+    when: 2025
+    note: 学部级奖励（Distinction），表彰博士期间的研究表现。
+  - title: UTS ARC Discovery Project 奖学金（全额）
+    sub: 悉尼科技大学 / 澳大利亚研究理事会
+    when: 2023
+  - title: UTS 国际研究奖学金
+    sub: 悉尼科技大学
+    when: 2023
+  - title: 浙江省专业学位研究生优秀实践成果奖
+    sub: 浙江省教育厅
+    when: 2022
+    note: 省级奖励，表彰专业学位研究生的优秀实践成果。
+  - title: 浙江省第四届大学生机器人竞赛 二等奖
+    sub: 浙江省
+    when: 2019
+  - title: “互联网+”创新创业大赛 二等奖
+    sub: 浙江工商大学
+    when: 2019

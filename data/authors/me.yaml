@@ -81,8 +81,7 @@ experience:
     org: Zhejiang Gongshang University
     start: 2027-03-01
     summary: |
-      Joining as a faculty member (talent introduction programme), School of
-      Computer Science and Information Engineering / related department.
+      Joining as a faculty member under the university's talent introduction programme.
   - role: Research Intern
     org: Token Foundry, Alibaba Token Hub, Alibaba Group
     start: 2025-12-11
@@ -167,9 +166,9 @@ awards:
     icon: hero/trophy
   - title: Second Prize, 4th Zhejiang Province University Student Robotics Competition
     awarder: Zhejiang Province
-    summary: Year to be confirmed.
+    date: "2019-01-01"
     icon: hero/trophy
   - title: Second Prize, “Internet+” Innovation and Entrepreneurship Competition
     awarder: Zhejiang Gongshang University
-    summary: Year to be confirmed.
+    date: "2019-01-01"
     icon: hero/trophy
