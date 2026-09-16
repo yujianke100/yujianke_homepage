@@ -97,17 +97,27 @@ sections:
       title: '🧑‍🏫 Academic Services'
       subtitle: ''
       text: |-
+        **Invited Talks**
+
+        - *Scalable Big Data Computation*, Seminar, School of Data Science, The Chinese University of Hong Kong, Shenzhen
+
         **Peer Reviewing**
 
-        - Reviewer, *IEEE Transactions on Knowledge and Data Engineering* (TKDE), 2025 —
+        - Reviewer, *IEEE Transactions on Knowledge and Data Engineering* (TKDE), 2025
 
         **Teaching**
 
         - Guest Lecturer, *43023 Emerging Topics in Artificial Intelligence*, University of Technology Sydney, Spring 2025
+        - Teaching Assistant, *COMP9311 Database Systems*, UNSW Sydney, Term 3 2023
+        - Teaching Assistant, *DATA1001 Introduction to Data Science*, UNSW Sydney, Term 2 2024 & Term 2 2025
+
+        **Research Infrastructure**
+
+        - Platform Administrator, research computing platform of Prof. Ying Zhang & Prof. Xiaoyang Wang's team, Zhejiang Gongshang University
 
         **Community**
 
-        - Student Volunteer / session support, research seminars of the Data Science and Machine Learning group, UTS, 2024 —
+        - Student Volunteer / session support, research seminars of the Data Science and Machine Learning group, UTS, 2024
     design:
       columns: '1'
 

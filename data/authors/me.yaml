@@ -10,9 +10,9 @@ name:
   pronouns: he/him
 postnominals:
   - PhD
-role: PhD Researcher in Graph Machine Learning & Databases
+role: PhD (2026) in Graph Machine Learning & Databases
 bio: |
-  I am a PhD researcher at the University of Technology Sydney (UTS), supervised by
+  I completed my PhD at the University of Technology Sydney (UTS) in 2026, supervised by
   Prof. Ying Zhang and A/Prof. Lu Qin. My research develops machine learning algorithms
   for graph-structured data and database systems — graph neural network architectures,
   and learning-based methods that improve database and data-mining algorithms
@@ -57,11 +57,13 @@ education:
   - degree: PhD, Information Technology
     institution: University of Technology Sydney
     start: 2023-07-01
-    end: 2026-12-31
+    end: 2026-09-09
     summary: |
-      Supervised by Prof. Ying Zhang and A/Prof. Lu Qin. Thesis on learning-based
-      algorithms for graph-structured data and database systems. Published in KDD 2023,
-      IEEE TKDE (2024, 2025, 2026). Recipient of the UTS FEIT HDR Excellence Award (2025).
+      Conferred 9 September 2026. Supervised by Prof. Ying Zhang and A/Prof. Lu Qin.
+      Thesis: "Fraud detection on the customer-product bipartite graph" (learning-based
+      algorithms for graph-structured data and database systems). Published in KDD 2023
+      and IEEE TKDE (2024, 2025, 2026). Recipient of the UTS FEIT HDR Excellence Award,
+      Individual Category, Distinction (2025).
   - degree: M.Eng, Electronic Information
     institution: Zhejiang Gongshang University
     start: 2020-09-01
@@ -145,10 +147,10 @@ awards:
     date: "2026-01-01"
     summary: National-level award for outstanding self-financed PhD students abroad.
     icon: hero/trophy
-  - title: UTS FEIT HDR Excellence Award (Individual Category)
+  - title: UTS FEIT HDR Excellence Award — Individual Category, Distinction
     awarder: University of Technology Sydney, Faculty of Engineering and IT
     date: "2025-06-01"
-    summary: Faculty award for research excellence during HDR candidature.
+    summary: Faculty-level award (Distinction) for research excellence during HDR candidature.
     icon: hero/trophy
   - title: UTS ARC Discovery Project Scholarship (Full Scholarship)
     awarder: University of Technology Sydney / Australian Research Council

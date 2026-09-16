@@ -21,5 +21,8 @@ main:
     url: /#services
     weight: 40
   - name: CV
-    url: experience/
+    url: /cv/
     weight: 50
+  - name: Experience
+    url: /experience/
+    weight: 55
