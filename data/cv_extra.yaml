@@ -33,7 +33,7 @@ research_statement: |
 invited_talks:
   - title: "Scalable Big Data Computation"
     event: "Seminar, School of Data Science, The Chinese University of Hong Kong, Shenzhen"
-    date: ""         # ← TODO 待补：具体举办日期（如 2025.11）；留空则简历上不显示日期
+    date: "18 Apr 2026"
 
 academic_service:
   - role: "Peer Reviewer"
