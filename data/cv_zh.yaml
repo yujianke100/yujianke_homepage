@@ -21,10 +21,10 @@ contact:
     label: jianke-yu.online
     url: https://jianke-yu.online
   - key: 学术
-    label: Google Scholar
+    label: scholar.google.com/citations?user=EwomMksAAAAJ
     url: https://scholar.google.com/citations?user=EwomMksAAAAJ
   - key: ORCID
-    label: 0000-0002-2032-7727
+    label: orcid.org/0000-0002-2032-7727
     url: https://orcid.org/0000-0002-2032-7727
   - key: DBLP
     label: dblp.org/pid/316/0485

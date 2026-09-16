@@ -41,9 +41,9 @@ h1 { margin: 0; font-size: 21pt; line-height: 1.14; color: var(--navy); font-wei
 h1 .alt { font-size: 12pt; font-weight: 500; color: var(--ink-2); margin-left: 9px; letter-spacing: 0; }
 .role { font-size: 10.8pt; font-weight: 600; color: var(--navy); margin-top: 2.5px; }
 .where { font-size: 9.6pt; color: var(--ink-3); margin-top: 1px; }
-.contact { margin-top: 5.5px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.5px 10px; font-size: 9.4pt; }
-.contact span { color: var(--ink); overflow-wrap: anywhere; }
-.contact .k { color: var(--ink-3); margin-right: 3px; }
+.contact { margin-top: 5.5px; font-size: 9.4pt; color: var(--ink); }
+.contact span { white-space: nowrap; }
+.contact span > a { overflow-wrap: anywhere; }
 
 /* ---------- sections ---------- */
 h2 {
@@ -122,11 +122,11 @@ body[data-lang="zh-CN"] .skill { grid-template-columns: 72px 1fr; }
       <h1>俞鉴珂<span class="alt">Jianke Yu, 博士</span></h1>
       <div class="role">图机器学习与数据库方向 · 计算机科学博士（2026）</div>
       <div class="where">中国 · 杭州</div>
-      <div class="contact"><span><span class="k">邮箱</span><a href="mailto:yujianke100@gmail.com">yujianke100@gmail.com</a></span><span><span class="k">主页</span><a href="https://jianke-yu.online">jianke-yu.online</a></span><span><span class="k">学术</span><a href="https://scholar.google.com/citations?user=EwomMksAAAAJ">Google Scholar</a></span><span><span class="k">ORCID</span><a href="https://orcid.org/0000-0002-2032-7727">0000-0002-2032-7727</a></span><span><span class="k">DBLP</span><a href="https://dblp.org/pid/316/0485.html">dblp.org/pid/316/0485</a></span><span><span class="k">GitHub</span><a href="https://github.com/yujianke100">github.com/yujianke100</a></span></div>
+      <div class="contact"><span><a href="mailto:yujianke100@gmail.com">yujianke100@gmail.com</a></span> · <span><a href="https://jianke-yu.online">jianke-yu.online</a></span> · <span><a href="https://scholar.google.com/citations?user=EwomMksAAAAJ">scholar.google.com/citations?user=EwomMksAAAAJ</a></span> · <span><a href="https://orcid.org/0000-0002-2032-7727">orcid.org/0000-0002-2032-7727</a></span> · <span><a href="https://dblp.org/pid/316/0485.html">dblp.org/pid/316/0485</a></span> · <span><a href="https://github.com/yujianke100">github.com/yujianke100 (183 ★)</a></span></div>
     </div>
   </header>
 
-  <h2><span class="bar"></span>研究兴趣<span class="rule"></span></h2>
+  <h2><span class="bar"></span>研究方向<span class="rule"></span></h2>
   <div class="entry"><div class="n">面向图结构数据与数据库系统的机器学习方法研究：面向不完整图、属性图与动态图的图神经网络 结构（欺诈检测、恶意软件检测、图相似性计算），以及用于加速数据库查询与数据挖掘过程的 学习型算法。</div></div>
   <div class="entry"><span class="t">关键词：</span> 图神经网络、图数据库、面向数据库的 AI、欺诈检测、知识图谱</div>
 

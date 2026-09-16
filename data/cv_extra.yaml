@@ -8,7 +8,8 @@
 # 更新后重新生成：
 #   python3 scripts/build_cv.py --pdf
 
-# 简历头部联系方式（顺序即显示顺序；key 是左侧的灰色小标签）
+# 简历头部联系方式（顺序即显示顺序）
+# 注意：打印出来要有用，所以一律写完整网址（Google Scholar / ORCID 尤其不能只写名字）
 contact:
   location: Hangzhou, China
   items:
@@ -19,10 +20,10 @@ contact:
       label: jianke-yu.online
       url: https://jianke-yu.online
     - key: Scholar
-      label: Google Scholar
+      label: scholar.google.com/citations?user=EwomMksAAAAJ
       url: https://scholar.google.com/citations?user=EwomMksAAAAJ
     - key: ORCID
-      label: 0000-0002-2032-7727
+      label: orcid.org/0000-0002-2032-7727
       url: https://orcid.org/0000-0002-2032-7727
     - key: DBLP
       label: dblp.org/pid/316/0485
@@ -30,6 +31,11 @@ contact:
     - key: GitHub
       label: github.com/yujianke100
       url: https://github.com/yujianke100
+
+# GitHub 星标：构建时从 GitHub API 取"自有仓库（排除 fork）star 合计"，失败时用缓存
+github:
+  user: yujianke100
+  show_stars: true
 
 # 研究概述（简历里 Research Interests 之上的一段）
 research_statement: |

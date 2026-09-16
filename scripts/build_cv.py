@@ -17,10 +17,12 @@ from __future__ import annotations
 
 import argparse
 import html as ht
+import json
 import re
 import shutil
 import subprocess
 import sys
+import urllib.request
 from datetime import datetime
 from pathlib import Path
 
@@ -58,7 +60,7 @@ LABELS: dict[str, dict[str, str]] = {
         "print": "Print / Save as PDF",
         "download": "Download PDF",
         "switch": "中文版",
-        "research": "Research Interests",
+        "research": "Research Areas",
         "keywords": "Keywords:",
         "education": "Education",
         "appointments": "Appointments & Experience",
@@ -80,7 +82,7 @@ LABELS: dict[str, dict[str, str]] = {
         "print": "打印 · 存为 PDF",
         "download": "下载 PDF",
         "switch": "English",
-        "research": "研究兴趣",
+        "research": "研究方向",
         "keywords": "关键词：",
         "education": "教育经历",
         "appointments": "工作与科研经历",
@@ -163,6 +165,63 @@ BADGE_ZH = {
 
 def localize_badge(name: str, lang: str) -> str:
     return BADGE_ZH.get(name, name) if lang == "zh" else name
+
+
+# ---------------------------------------------------------------- github 星标
+GH_CACHE = ROOT / "data" / ".cache_github.json"
+_GH_STARS: dict[str, int | None] = {}
+
+
+def github_stars(user: str) -> int | None:
+    """自有仓库（排除 fork）的 star 合计；结果写缓存，API 失败时用缓存值。"""
+    if user in _GH_STARS:
+        return _GH_STARS[user]
+
+    cache: dict = {}
+    if GH_CACHE.exists():
+        try:
+            cache = json.loads(GH_CACHE.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            cache = {}
+
+    stars: int | None = None
+    try:
+        req = urllib.request.Request(
+            f"https://api.github.com/users/{user}/repos?per_page=100&type=owner",
+            headers={"User-Agent": "build_cv", "Accept": "application/vnd.github+json"},
+        )
+        with urllib.request.urlopen(req, timeout=10) as fh:
+            data = json.load(fh)
+        if isinstance(data, list):
+            own = [r for r in data if not r.get("fork")]
+            stars = sum(int(r.get("stargazers_count") or 0) for r in own)
+            cache[user] = {
+                "stars": stars,
+                "repos": len(own),
+                "fetched": datetime.now().strftime("%Y-%m-%d"),
+            }
+            GH_CACHE.write_text(json.dumps(cache, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            print(f"[gh]   {user}: {stars} stars（{len(own)} 个自有仓库）")
+    except Exception as exc:  # noqa: BLE001 — 网络/限流都可能失败，回退缓存
+        print(f"[warn] GitHub star 获取失败（{exc}），改用缓存值", file=sys.stderr)
+        got = (cache.get(user) or {}).get("stars")
+        stars = int(got) if got is not None else None
+
+    _GH_STARS[user] = stars
+    return stars
+
+
+def apply_github_stars(items: list[dict], cfg: dict) -> list[dict]:
+    """给 GitHub 那条联系方式后面加上“（N ★）”。"""
+    if not cfg.get("show_stars"):
+        return items
+    stars = github_stars(str(cfg.get("user") or "yujianke100"))
+    if stars is None:
+        return items
+    for item in items:
+        if "github.com" in str(item.get("url", "")):
+            item["label"] = f'{item["label"]} ({stars} ★)'
+    return items
 
 
 def load_publications() -> list[dict]:
@@ -256,6 +315,7 @@ def content_en() -> dict:
         {"key": clean(i.get("key")), "label": clean(i.get("label")), "url": (i.get("url") or "").strip()}
         for i in (contact_cfg.get("items") or [])
     ]
+    contact = apply_github_stars(contact, extra.get("github") or {})
 
     education = [
         {
@@ -343,6 +403,7 @@ def content_en() -> dict:
 
 def content_zh() -> dict:
     zh = load_yaml(ROOT / "data" / "cv_zh.yaml")
+    extra = load_yaml(ROOT / "data" / "cv_extra.yaml")
     name = zh.get("name") or {}
 
     def entries(key: str) -> list[dict]:
@@ -361,10 +422,13 @@ def content_zh() -> dict:
         "alt": f"{clean(name.get('alt'))}, {clean(name.get('postnominal'))}".strip(", "),
         "role": clean(zh.get("role")),
         "location": clean(zh.get("location")),
-        "contact": [
-            {"key": clean(i.get("key")), "label": clean(i.get("label")), "url": (i.get("url") or "").strip()}
-            for i in zh.get("contact") or []
-        ],
+        "contact": apply_github_stars(
+            [
+                {"key": clean(i.get("key")), "label": clean(i.get("label")), "url": (i.get("url") or "").strip()}
+                for i in zh.get("contact") or []
+            ],
+            extra.get("github") or {},
+        ),
         "statement": clean(zh.get("research_statement")),
         "interests": clean(zh.get("interests")),
         "education": entries("education"),
@@ -378,8 +442,8 @@ def content_zh() -> dict:
             {"k": clean(i.get("key")), "v": clean(i.get("value"))} for i in zh.get("skills") or []
         ],
         "languages": clean(zh.get("languages")),
-        "sections": load_yaml(ROOT / "data" / "cv_extra.yaml").get("sections") or {},
-        "pub_cfg": load_yaml(ROOT / "data" / "cv_extra.yaml").get("publications") or {},
+        "sections": extra.get("sections") or {},
+        "pub_cfg": extra.get("publications") or {},
     }
 
 
@@ -418,9 +482,9 @@ h1 { margin: 0; font-size: 21pt; line-height: 1.14; color: var(--navy); font-wei
 h1 .alt { font-size: 12pt; font-weight: 500; color: var(--ink-2); margin-left: 9px; letter-spacing: 0; }
 .role { font-size: 10.8pt; font-weight: 600; color: var(--navy); margin-top: 2.5px; }
 .where { font-size: 9.6pt; color: var(--ink-3); margin-top: 1px; }
-.contact { margin-top: 5.5px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.5px 10px; font-size: 9.4pt; }
-.contact span { color: var(--ink); overflow-wrap: anywhere; }
-.contact .k { color: var(--ink-3); margin-right: 3px; }
+.contact { margin-top: 5.5px; font-size: 9.4pt; color: var(--ink); }
+.contact span { white-space: nowrap; }
+.contact span > a { overflow-wrap: anywhere; }
 
 /* ---------- sections ---------- */
 h2 {
@@ -561,8 +625,9 @@ def build_html(lang: str) -> str:
     data = content_en() if lang == "en" else content_zh()
     generated = datetime.now().strftime("%d %b %Y") if lang == "en" else datetime.now().strftime("%Y-%m-%d")
 
-    contact = "".join(
-        f'<span><span class="k">{esc(i["key"])}</span>'
+    # 联系方式：一整行流动的完整网址（打印出来也能照着输），条目之间用 · 分隔
+    contact = " · ".join(
+        "<span>"
         + (f'<a href="{esc(i["url"])}">{esc(i["label"])}</a>' if i["url"] else esc(i["label"]))
         + "</span>"
         for i in data["contact"]
