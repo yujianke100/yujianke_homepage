@@ -484,7 +484,7 @@ h1 .alt { font-size: 12pt; font-weight: 500; color: var(--ink-2); margin-left: 9
 .where { font-size: 9.6pt; color: var(--ink-3); margin-top: 1px; }
 .contact { margin-top: 5.5px; font-size: 9.4pt; color: var(--ink); }
 .contact span { white-space: nowrap; }
-.contact span > a { overflow-wrap: anywhere; }
+.contact .k { color: var(--ink-3); margin-right: 3px; }
 
 /* ---------- sections ---------- */
 h2 {
@@ -625,9 +625,9 @@ def build_html(lang: str) -> str:
     data = content_en() if lang == "en" else content_zh()
     generated = datetime.now().strftime("%d %b %Y") if lang == "en" else datetime.now().strftime("%Y-%m-%d")
 
-    # 联系方式：一整行流动的完整网址（打印出来也能照着输），条目之间用 · 分隔
+    # 联系方式：小标签 + 短标识，一行流动、· 分隔（标签是给打印稿看的）
     contact = " · ".join(
-        "<span>"
+        f'<span><span class="k">{esc(i["key"])}</span>'
         + (f'<a href="{esc(i["url"])}">{esc(i["label"])}</a>' if i["url"] else esc(i["label"]))
         + "</span>"
         for i in data["contact"]

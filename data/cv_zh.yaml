@@ -21,16 +21,16 @@ contact:
     label: jianke-yu.online
     url: https://jianke-yu.online
   - key: 学术
-    label: scholar.google.com/citations?user=EwomMksAAAAJ
+    label: EwomMksAAAAJ
     url: https://scholar.google.com/citations?user=EwomMksAAAAJ
   - key: ORCID
-    label: orcid.org/0000-0002-2032-7727
+    label: 0000-0002-2032-7727
     url: https://orcid.org/0000-0002-2032-7727
   - key: DBLP
-    label: dblp.org/pid/316/0485
+    label: 316/0485
     url: https://dblp.org/pid/316/0485.html
   - key: GitHub
-    label: github.com/yujianke100
+    label: yujianke100
     url: https://github.com/yujianke100
 
 research_statement: |

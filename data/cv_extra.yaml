@@ -9,7 +9,7 @@
 #   python3 scripts/build_cv.py --pdf
 
 # 简历头部联系方式（顺序即显示顺序）
-# 注意：打印出来要有用，所以一律写完整网址（Google Scholar / ORCID 尤其不能只写名字）
+# 写法：小标签 + 短标识（打印出来靠标签知道是什么，靠短 ID 能搜到）
 contact:
   location: Hangzhou, China
   items:
@@ -20,16 +20,16 @@ contact:
       label: jianke-yu.online
       url: https://jianke-yu.online
     - key: Scholar
-      label: scholar.google.com/citations?user=EwomMksAAAAJ
+      label: EwomMksAAAAJ
       url: https://scholar.google.com/citations?user=EwomMksAAAAJ
     - key: ORCID
-      label: orcid.org/0000-0002-2032-7727
+      label: 0000-0002-2032-7727
       url: https://orcid.org/0000-0002-2032-7727
     - key: DBLP
-      label: dblp.org/pid/316/0485
+      label: 316/0485
       url: https://dblp.org/pid/316/0485.html
     - key: GitHub
-      label: github.com/yujianke100
+      label: yujianke100
       url: https://github.com/yujianke100
 
 # GitHub 星标：构建时从 GitHub API 取"自有仓库（排除 fork）star 合计"，失败时用缓存
