@@ -50,6 +50,15 @@ academic_service:
   - role: "Platform Administrator"
     org: "Research Computing Platform, Prof. Ying Zhang & Prof. Xiaoyang Wang's Team, Zhejiang Gongshang University"
     period: "2024–"
+    note: "Maintaining the group's GPU research computing platform (training and inference environments, accounts, resource scheduling)."
+
+# 荣誉与奖励 / 奖学金与资助 的拆分：这里列出属于"奖学金与资助"的奖项标题
+# （标题必须与 data/authors/me.yaml: awards 里的 title 完全一致，其余归入 Honors & Awards）
+awards_split:
+  scholarships:
+    - "Award for Outstanding Overseas Study Elite (2025–2026)"
+    - "UTS ARC Discovery Project Scholarship (Full Scholarship)"
+    - "UTS International Research Scholarship"
 
 teaching:
   - role: "Guest Lecturer"

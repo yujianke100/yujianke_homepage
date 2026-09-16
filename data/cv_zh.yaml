@@ -45,14 +45,14 @@ education:
     sub: 悉尼科技大学
     when: 2023.07 – 2026.09
     note: |
-      2026 年 9 月 9 日授予学位。导师：张颖教授、秦路副教授。博士学位论文
+      2026 年 9 月 9 日授予学位。导师：张颖教授、秦璐副教授、王翰宸博士。博士学位论文
       《Fraud detection on the customer-product bipartite graph》（面向图结构数据与数据库系统的
       学习型算法）。相关成果发表于 KDD 2023 与 IEEE TKDE（2024、2025、2026）。获 UTS 工程与
       信息技术学部 HDR 优秀奖（个人类，Distinction，2025）。
   - title: 硕士，电子信息
     sub: 浙江工商大学
     when: 2020.09 – 2023.06
-    note: 导师：王晓阳教授。研究方向为图表征学习、欺诈检测与图相似性计算。
+    note: 导师：王潇杨教授。研究方向为图表征学习、欺诈检测与图相似性计算。
   - title: 学士，电子信息工程
     sub: 浙江工商大学
     when: 2016.09 – 2020.06
@@ -89,8 +89,9 @@ academic_service:
     sub: IEEE Transactions on Knowledge and Data Engineering (TKDE)
     when: 2025
   - title: 平台管理员
-    sub: 浙江工商大学 张颖教授、王晓阳教授课题组 · 科研计算平台
+    sub: 浙江工商大学 张颖教授、王潇杨教授课题组 · 科研计算平台
     when: 2024 –
+    note: 维护课题组 GPU 科研计算平台（训练与推理环境、账号与资源调度）。
 
 teaching:
   - title: 客座讲师
@@ -111,22 +112,11 @@ skills:
 
 languages: 中文（母语）、英语（流利）
 
-awards:
-  # ⚠️ 第 1 条的颁奖单位口径待用户确认（国家留学基金委 / 留学服务中心）
-  - title: 海外优秀留学人员奖（2025–2026）
-    sub: 国家留学基金委
-    when: 2026
-    note: 面向海外优秀自费博士研究生的国家级奖励。
+awards:   # ← 荣誉与奖励（奖学金另列在下面的 scholarships，两段都在简历上）
   - title: UTS FEIT HDR 优秀奖 — 个人类 · Distinction
     sub: 悉尼科技大学 工程与信息技术学部
     when: 2025
     note: 学部级奖励（Distinction），表彰博士期间的研究表现。
-  - title: UTS ARC Discovery Project 奖学金（全额）
-    sub: 悉尼科技大学 / 澳大利亚研究理事会
-    when: 2023
-  - title: UTS 国际研究奖学金
-    sub: 悉尼科技大学
-    when: 2023
   - title: 浙江省专业学位研究生优秀实践成果奖
     sub: 浙江省教育厅
     when: 2022
@@ -137,3 +127,17 @@ awards:
   - title: “互联网+”创新创业大赛 二等奖
     sub: 浙江工商大学
     when: 2019
+
+scholarships:   # ← 奖学金与资助
+  # ⚠️ 第 1 条的颁奖单位口径待用户确认（国家留学基金委 / 留学服务中心）
+  - title: 海外优秀留学人员奖（2025–2026）
+    sub: 国家留学基金委
+    when: 2026
+    note: 面向海外优秀自费博士研究生的国家级奖励。
+  - title: UTS ARC Discovery Project 奖学金（全额）
+    sub: 悉尼科技大学 / 澳大利亚研究理事会
+    when: 2023
+    note: 覆盖学费与生活津贴的博士全额奖学金。
+  - title: UTS 国际研究奖学金
+    sub: 悉尼科技大学
+    when: 2023

@@ -65,6 +65,7 @@ LABELS: dict[str, dict[str, str]] = {
         "publications": "Selected Publications (first-author CCF-A)",
         "talks": "Invited Talks",
         "honors": "Honors & Awards",
+        "scholarships": "Scholarships & Funding",
         "service": "Academic Service",
         "teaching": "Teaching",
         "skills": "Skills",
@@ -85,6 +86,7 @@ LABELS: dict[str, dict[str, str]] = {
         "publications": "代表性论文（第一作者 CCF-A）",
         "talks": "学术报告",
         "honors": "荣誉与奖励",
+        "scholarships": "奖学金与资助",
         "service": "学术服务",
         "teaching": "教学工作",
         "skills": "技能",
@@ -280,17 +282,20 @@ def content_en() -> dict:
                 "n": clean(item.get("summary")),
             }
         )
-    awards = []
+    scholarship_titles = {
+        clean(t) for t in ((extra.get("awards_split") or {}).get("scholarships") or [])
+    }
+    awards: list[dict] = []
+    scholarships: list[dict] = []
     for i in me.get("awards") or []:
         note = clean(i.get("summary"))
-        awards.append(
-            {
-                "t": clean(i.get("title")),
-                "s": clean(i.get("awarder")),
-                "w": year_of(i.get("date")),
-                "n": "" if PLACEHOLDER_SKIP.search(note) else note,
-            }
-        )
+        entry = {
+            "t": clean(i.get("title")),
+            "s": clean(i.get("awarder")),
+            "w": year_of(i.get("date")),
+            "n": "" if PLACEHOLDER_SKIP.search(note) else note,
+        }
+        (scholarships if entry["t"] in scholarship_titles else awards).append(entry)
     skills = [
         {
             "k": clean(g.get("name")),
@@ -314,16 +319,17 @@ def content_en() -> dict:
         "education": education,
         "experience": experience,
         "talks": [
-            {"t": clean(i.get("title")), "s": clean(i.get("event")), "w": clean(i.get("date")), "n": ""}
+            {"t": clean(i.get("title")), "s": clean(i.get("event")), "w": clean(i.get("date")), "n": clean(i.get("note"))}
             for i in extra.get("invited_talks") or []
         ],
         "awards": awards,
+        "scholarships": scholarships,
         "service": [
-            {"t": clean(i.get("role")), "s": clean(i.get("org")), "w": clean(i.get("period")), "n": ""}
+            {"t": clean(i.get("role")), "s": clean(i.get("org")), "w": clean(i.get("period")), "n": clean(i.get("note"))}
             for i in extra.get("academic_service") or []
         ],
         "teaching": [
-            {"t": clean(i.get("role")), "s": clean(i.get("org")), "w": clean(i.get("period")), "n": ""}
+            {"t": clean(i.get("role")), "s": clean(i.get("org")), "w": clean(i.get("period")), "n": clean(i.get("note"))}
             for i in extra.get("teaching") or []
         ],
         "skills": skills,
@@ -362,6 +368,7 @@ def content_zh() -> dict:
         "experience": entries("experience"),
         "talks": entries("invited_talks"),
         "awards": entries("awards"),
+        "scholarships": entries("scholarships"),
         "service": entries("academic_service"),
         "teaching": entries("teaching"),
         "skills": [
@@ -386,11 +393,11 @@ html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 body {
   margin: 0 auto; background: #eef1f5; color: var(--ink);
   font-family: Inter, "Noto Sans", "Liberation Sans", Arial, sans-serif;
-  font-size: 9.9pt; line-height: 1.4;
+  font-size: 11.5pt; line-height: 1.46;
 }
 body[data-lang="zh-CN"] {
   font-family: "Noto Sans CJK SC", "Noto Sans SC", Inter, sans-serif;
-  font-size: 10pt; line-height: 1.6;
+  font-size: 11.5pt; line-height: 1.66;
 }
 .sheet {
   width: 210mm; min-height: 297mm; margin: 9mm auto; padding: 12mm 14mm 10mm;
@@ -617,6 +624,9 @@ def build_html(lang: str) -> str:
 
   {h2(labels["honors"])}
   {entries_html(data["awards"])}
+
+  {h2(labels["scholarships"])}
+  {entries_html(data["scholarships"])}
 
   <div class="cols">
     <div>

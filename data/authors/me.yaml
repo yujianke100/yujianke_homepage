@@ -13,7 +13,7 @@ postnominals:
 role: PhD (2026) in Graph Machine Learning & Databases
 bio: |
   I completed my PhD at the University of Technology Sydney (UTS) in 2026, supervised by
-  Prof. Ying Zhang and A/Prof. Lu Qin. My research develops machine learning algorithms
+  Prof. Ying Zhang, A/Prof. Lu Qin and Dr Hanchen Wang. My research develops machine learning algorithms
   for graph-structured data and database systems — graph neural network architectures,
   and learning-based methods that improve database and data-mining algorithms
   (fraud detection, graph similarity, supergraph search, malware detection).
@@ -59,7 +59,8 @@ education:
     start: 2023-07-01
     end: 2026-09-09
     summary: |
-      Conferred 9 September 2026. Supervised by Prof. Ying Zhang and A/Prof. Lu Qin.
+      Conferred 9 September 2026. Supervised by Prof. Ying Zhang, A/Prof. Lu Qin and
+      Dr Hanchen Wang.
       Thesis: "Fraud detection on the customer-product bipartite graph" (learning-based
       algorithms for graph-structured data and database systems). Published in KDD 2023
       and IEEE TKDE (2024, 2025, 2026). Recipient of the UTS FEIT HDR Excellence Award,
