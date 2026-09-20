@@ -43,7 +43,7 @@ jobs:
     timeout-minutes: 25
     env:
       DEPLOY_HOST: upload.jianke-yu.online
-      DEPLOY_PORT: "10198"
+      DEPLOY_PORT: "10240"
       DEPLOY_USER: homepage
       DEPLOY_DIR: /home/homepage
       HUGO_VERSION: "0.162.1"
