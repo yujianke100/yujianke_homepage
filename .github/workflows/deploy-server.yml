@@ -14,6 +14,13 @@ name: Build & deploy to server (jianke-yu.online)
 on:
   push:
     branches: ['main']
+  # 论文同步工作流（Sync publications）是用默认 GITHUB_TOKEN 提交的，
+  # 按 GitHub 的防循环规则不会触发上面的 push 事件 —— 结果是每天的自动同步
+  # 只改了仓库、线上站点一直是旧的（SARL 的 DOI 就是这样没上线的）。
+  # 这里显式挂上 workflow_run，让自动同步完成后也能真正部署。
+  workflow_run:
+    workflows: ["Sync publications (OpenAlex)"]
+    types: [completed]
   workflow_dispatch:
     inputs:
       target:
