@@ -10,7 +10,7 @@ authors:
   - "Jinglin Wu"
   - "Lifan Liu"
   - "Yongfei Liu"
-  - "John Shepherd"
+  - "John A. Shepherd"
   - "Wenjie Zhang"
 author_position: 2
 date: 2025-10-18

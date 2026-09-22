@@ -10,7 +10,7 @@ authors:
   - "Wenjie Zhang"
   - "Jian Liao"
   - "Ying Zhang"
-  - "Bailin Yang"
+  - "Bailin L. Yang"
 author_position: 1
 date: 2024-10-31
 publishDate: 2024-10-31
