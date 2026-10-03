@@ -17,7 +17,7 @@ publication:
   year: 2022
 peer_reviewed: true
 open_access: true
-cited_by: 15
+cited_by: 16
 featured: false
 awards:
   - name: "CCF-B"
