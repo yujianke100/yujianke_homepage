@@ -80,17 +80,18 @@ experience:
     start: 2027-03-01
     summary: |
       Joining as a faculty member under the university's talent introduction programme.
+  - role: Research Assistant
+    org: University of Technology Sydney
+    start: 2026-07-01
+    summary: |
+      Casual research assistant on the ARC Discovery Project led by Prof. Ying Zhang.
+      Graph neural networks, graph similarity search and learning-based database algorithms.
+      Ongoing.
   - role: Research Intern
     org: Token Foundry, Alibaba Token Hub, Alibaba Group
     start: 2025-12-11
     summary: |
       Research on graph learning methods for industrial data systems.
-  - role: Research Assistant
-    org: University of Technology Sydney
-    start: 2023-07-01
-    summary: |
-      ARC Discovery Project. Graph neural networks, graph similarity search and
-      learning-based database algorithms.
   - role: Guest Lecturer
     org: University of Technology Sydney
     start: 2025-07-28

@@ -57,14 +57,14 @@ education:
     when: 2016.09 – 2020.06
 
 experience:
+  - title: 研究助理
+    sub: 悉尼科技大学
+    when: 2026.07 – 至今
+    note: 在张颖教授主持的 ARC Discovery Project 中任研究助理。图神经网络、图相似性检索与学习型数据库算法。
   - title: 研究实习生
     sub: 阿里巴巴集团 · Token Foundry, Alibaba Token Hub
     when: 2025.12 – 至今
     note: 面向工业数据系统的图学习方法研究。
-  - title: 研究助理
-    sub: 悉尼科技大学
-    when: 2023.07 – 至今
-    note: ARC Discovery Project。图神经网络、图相似性检索与学习型数据库算法。
   - title: 客座讲师
     sub: 悉尼科技大学
     when: 2025.07 – 2025.10
