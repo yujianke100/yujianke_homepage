@@ -940,10 +940,17 @@ def role_tags(item: dict, roles: dict) -> list[str]:
     return tags
 
 
+def load_preprint_status() -> dict[str, str]:
+    """预印本的投稿状态（按标题匹配；数据在 data/cv_extra.yaml）。"""
+    extra = load_yaml(ROOT / "data" / "cv_extra.yaml")
+    return {str(k): str(v) for k, v in (extra.get("preprint_status") or {}).items()}
+
+
 def prepare_core_items() -> tuple[list[dict], list[dict], list[dict]]:
     """返回 (主表, 其他已发表, 预印本)。后两者每条都带 exclude_reason。"""
     ratings = load_venue_ratings()
     roles = load_roles()
+    preprint_status = load_preprint_status()
     items = load_publications()
     for item in items:
         meta = rate_of(item["venue"], ratings)
@@ -956,6 +963,7 @@ def prepare_core_items() -> tuple[list[dict], list[dict], list[dict]]:
         item["a_plus"] = str(item["rating"] or "").startswith("A+")
         # 预印本（arXiv 等）单独成段，不与已发表论文混排
         item["is_preprint"] = item["folder"] not in ("journal-article", "conference-paper")
+        item["preprint_status"] = preprint_status.get(item["title"], "")
         # 会议短文（Extended Abstract）在工商版里整条不列（用户要求：不进任何分段）
         item["hidden"] = not item["long_paper"]
 
@@ -1002,6 +1010,8 @@ def core_rows_html(items: list[dict], me_name: str, start: int = 1, with_note: b
         cite = f'<span class="cite">{cites} 次被引</span>' if cites else ""
         venue = f'<span class="venue">{esc(item["venue"])}</span>' if item["venue"] else ""
         tail = f"，{esc(item['year'])}" if item["year"] else ""
+        if item.get("preprint_status"):
+            tail += f"，{esc(item['preprint_status'])}"
         note = ""
         if with_note:
             rate_txt = item.get("rating") or "推荐表未收录"
@@ -1019,6 +1029,18 @@ def core_rows_html(items: list[dict], me_name: str, start: int = 1, with_note: b
             f'<div class="pmeta">{tags}{rate}{chips}{pub_links_html(item)}{cite}</div>{note}</li>'
         )
     return "\n".join(rows)
+
+
+def preprint_note(preprints: list[dict]) -> str:
+    """预印本分组的说明行（若有投稿状态则一并注明）。"""
+    if not preprints:
+        return ""
+    statuses = sorted({str(p["preprint_status"]) for p in preprints if p.get("preprint_status")})
+    tail = f"；投稿状态：{'；'.join(statuses)}" if statuses else ""
+    return (
+        f'<div class="group-note">以下为 arXiv 预印本，尚未正式发表{tail}，'
+        "单独列出、不计入上述统计。</div>"
+    )
 
 
 def build_core_html() -> str:
@@ -1077,7 +1099,7 @@ def build_core_html() -> str:
   </ul>
 
   {h2("预印本（未正式发表）") if preprints else ""}
-  {f'<div class="group-note">以下为 arXiv 预印本，尚未正式发表，单独列出、不计入上述统计。</div>' if preprints else ""}
+  {preprint_note(preprints)}
   {f'<ul class="pubs pubs-full">{chr(10)}{core_rows_html(preprints, AUTHOR_LINE_NAME, start=len(main) + len(others) + 1, with_note=True)}{chr(10)}</ul>' if preprints else ""}
 
   <div class="foot">
@@ -1143,9 +1165,7 @@ def build_gjgsu_html() -> str:
     )
 
     legend = (
-        "标签：<span class=\"tag\">一作</span>第一作者　<span class=\"tag\">通讯作者</span>"
-        "<span class=\"tag\">导师一作·学生二作</span><span class=\"tag\">共同一作 / 共同通讯</span>（人工确认后标注）　"
-        "│ 等级：<span class=\"badge ccf\">A+++</span><span class=\"badge ccf\">A+</span> = 推荐表推荐指数；"
+        "等级：<span class=\"badge ccf\">A+++</span><span class=\"badge ccf\">A+</span> = 推荐表推荐指数；"
         "CCF-A/B/C = CCF 推荐目录；中科院 N 区 / JCR Qn = 期刊分区。"
     )
 
@@ -1213,7 +1233,7 @@ def build_gjgsu_html() -> str:
   </ul>
 
   {h2("预印本（未正式发表）") if preprints else ""}
-  {f'<div class="group-note">以下为 arXiv 预印本，尚未正式发表，单独列出、不计入上述统计。</div>' if preprints else ""}
+  {preprint_note(preprints)}
   {f'<ul class="pubs pubs-full">{chr(10)}{core_rows_html(preprints, AUTHOR_LINE_NAME, start=len(main) + len(others) + 1, with_note=True)}{chr(10)}</ul>' if preprints else ""}
 
   {h2(LABELS["zh"]["scholarships"])}

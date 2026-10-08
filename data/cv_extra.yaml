@@ -58,6 +58,9 @@ academic_service:
     period: "2021–"
     note: "Taking charge of the group's GPU research computing platform since its first server was set up in 2021 (training and inference environments, accounts, LDAP-based access, resource scheduling, monitoring)."
 
+preprint_status:
+  "A Hypergraph-Based Framework for Exploratory Business Intelligence": "ACM SIGMOD 2027 在投（under review）"
+
 # 荣誉与奖励 / 奖学金与资助 的拆分：这里列出属于"奖学金与资助"的奖项标题
 # （标题必须与 data/authors/me.yaml: awards 里的 title 完全一致，其余归入 Honors & Awards）
 awards_split:
