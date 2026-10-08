@@ -60,6 +60,16 @@ COAUTHOR_WHITELIST = {
     "John Shepherd", "Zhengyi Yang", "Weiyuan Wang", "Xijuan Liu",
 }
 EXCLUDE_TITLE_RE = re.compile(r"^\s*(correction to|erratum|retraction|withdrawn)", re.I)
+# 作者名修正：OpenAlex/Crossref 偶尔把合作者写成「同名的另一个人」。
+#   GLOBAL —— 同一个人的不同写法，全库统一（键为小写）
+#   BY_DOI —— 只对该论文生效（谨慎用，避免误伤真正同名的其他作者）
+AUTHOR_NAME_FIXES = {
+    "bailin l. yang": "Bailin Yang",
+}
+AUTHOR_NAME_FIXES_BY_DOI = {
+    # MGDN（TKDE 2026）：OpenAlex 的末位作者写成 Bo Yang，实为 Bailin Yang
+    "10.1109/tkde.2026.3689176": {"bo yang": "Bailin Yang"},
+}
 DROP_TYPES = {"repository", "dataset", "erratum", "editorial", "letter", "paratext",
               "peer-review", "dissertation", "libguides", "grant", "software"}
 CONFERENCE_TYPES = {"conference-paper", "proceedings-article"}
@@ -97,12 +107,19 @@ def clean(text: str | None) -> str:
     return out.replace("\u2011", "-").replace("\u00a0", " ").strip()
 
 
-def fix_name(name: str) -> str:
-    """OpenAlex/Crossref 偶尔返回全大写作者名（如 YING ZHANG），统一成 Title Case。"""
+def fix_name(name: str, doi: str = "") -> str:
+    """归一化作者名：全大写 → Title Case；再按（全局 / 按论文）修正表改写。
+
+    修正表存在的理由：OpenAlex 与 Crossref 偶尔把合作者写成「同名的另一个人」
+    （如 MGDN 的末位作者被写成 Bo Yang，实际是 Bailin Yang）。手改生成文件会被
+    下一次同步覆盖，所以修正必须登记在这里。
+    """
     n = clean(name)
     if len(n) > 3 and n.isupper():
-        return " ".join(w.capitalize() for w in n.split())
-    return n
+        n = " ".join(w.capitalize() for w in n.split())
+    n = AUTHOR_NAME_FIXES.get(n.lower(), n)
+    per_doi = AUTHOR_NAME_FIXES_BY_DOI.get((doi or "").lower()) or {}
+    return per_doi.get(n.lower(), n)
 
 
 def load_config() -> tuple[dict, list[tuple[re.Pattern, str]]]:
@@ -242,9 +259,10 @@ def venue_of(work: dict, venues: dict, aliases: list[tuple[re.Pattern, str]],
 
 
 def authors_of(work: dict) -> tuple[list[str], int]:
+    doi = (work.get("doi") or "").replace("https://doi.org/", "").lower()
     out, pos = [], 0
     for i, a in enumerate(work.get("authorships") or [], start=1):
-        name = fix_name((a.get("author") or {}).get("display_name", ""))
+        name = fix_name((a.get("author") or {}).get("display_name", ""), doi)
         if name.lower() in OWN_NAMES:
             out.append("me")
             pos = pos or i
@@ -254,7 +272,11 @@ def authors_of(work: dict) -> tuple[list[str], int]:
 
 
 def coauthor_ok(work: dict) -> bool:
-    names = {fix_name((a.get("author") or {}).get("display_name", "")) for a in work.get("authorships") or []}
+    doi = (work.get("doi") or "").replace("https://doi.org/", "").lower()
+    names = {
+        fix_name((a.get("author") or {}).get("display_name", ""), doi)
+        for a in work.get("authorships") or []
+    }
     return bool(names & COAUTHOR_WHITELIST)
 
 

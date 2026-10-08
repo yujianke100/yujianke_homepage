@@ -32,6 +32,8 @@ ROOT = Path(__file__).resolve().parents[1]
 STATIC_CV = ROOT / "static" / "cv"
 PHOTO = STATIC_CV / "photo.jpg"
 SITE = "jianke-yu.online"
+# 论文条目作者行里本人的写法：与其它作者保持一致，统一用英文名（中文版也一样）
+AUTHOR_LINE_NAME = "Jianke Yu"
 
 TARGETS: dict[str, dict] = {
     "en": {
@@ -572,7 +574,7 @@ body[data-lang="zh-CN"] h2 { font-size: 11.4pt; letter-spacing: .5px; text-trans
 .pubs { list-style: none; margin: 0; padding: 0; }
 /* 悬挂缩进：编号绝对定位在最左（不能用 flex —— 行内的 venue/badge 会被拆成 flex item；
    也不能用负 text-indent —— Chrome 打印时会把后续行的 inline-block 徽章叠在文字上） */
-.pubs li { position: relative; padding-left: 30px; margin-bottom: 3.6px; page-break-inside: avoid; break-inside: avoid; }
+.pubs li { position: relative; padding-left: 34px; margin-bottom: 3.6px; page-break-inside: avoid; break-inside: avoid; }
 .pubs li .num { position: absolute; left: 0; top: 0; color: var(--navy); font-weight: 700; }
 .venue { font-style: italic; color: var(--ink-2); }
 .badge {
@@ -703,7 +705,7 @@ def pubs_block(cfg: dict, lang: str) -> str:
         venue = f'<span class="venue">{esc(item["venue"])}</span>' if item["venue"] else ""
         tail = f", {esc(item['year'])}" if item["year"] else ""
         rows.append(
-            f'<li><span class="num">[{idx}]</span>{esc(item["title"])}. {venue}{tail}.'
+            f'<li><span class="num">[{idx}]</span> {esc(item["title"])}. {venue}{tail}.'
             f'{marks}{chips}</li>'
         )
     return f'<div class="pubstats">{esc(summary)}</div>\n<ul class="pubs">\n' + "\n".join(rows) + "\n</ul>"
@@ -763,7 +765,7 @@ def pub_list_rows(items: list[dict], lang: str, labels: dict, me_name: str, star
         venue = f'<span class="venue">{esc(item["venue"])}</span>' if item["venue"] else ""
         tail = f", {esc(item['year'])}" if item["year"] else ""
         rows.append(
-            f'<li><span class="num">[{idx}]</span><span class="ptitle">{esc(item["title"])}</span>. '
+            f'<li><span class="num">[{idx}]</span> <span class="ptitle">{esc(item["title"])}</span>. '
             f"{venue}{tail}."
             f'<div class="pauth">{pub_authors_html(item, me_name)}</div>'
             f'<div class="pmeta">{marks}{chips}{pub_links_html(item)}{cite}</div></li>'
@@ -818,7 +820,7 @@ def build_publications_html(lang: str) -> str:
         group = order(by_type[key])
         if not group:
             continue
-        rows, indexed = pub_list_rows(group, lang, labels, data["name"], start=indexed)
+        rows, indexed = pub_list_rows(group, lang, labels, AUTHOR_LINE_NAME, start=indexed)
         groups_html += f'\n  {h2(labels[key])}\n  <ul class="pubs pubs-full">\n{rows}\n  </ul>\n'
 
     summary = pubs_page_summary(pub_stats(items), lang)
@@ -910,8 +912,8 @@ def role_tags(item: dict, roles: dict) -> list[str]:
     return tags
 
 
-def prepare_core_items() -> tuple[list[dict], list[dict], list[dict]]:
-    """返回 (主表, 待确认, 其他参考)。"""
+def prepare_core_items() -> tuple[list[dict], list[dict]]:
+    """返回 (主表, 其他)。其他里的每条都带 exclude_reason（为什么没计入）。"""
     ratings = load_venue_ratings()
     roles = load_roles()
     items = load_publications()
@@ -925,21 +927,33 @@ def prepare_core_items() -> tuple[list[dict], list[dict], list[dict]]:
         item["long_paper"] = "extended abstract" not in item["title"].lower()
         item["a_plus"] = str(item["rating"] or "").startswith("A+")
 
+        if item["year_int"] < CORE_MIN_YEAR:
+            reason = f"{CORE_MIN_YEAR} 年前发表"
+        elif not item["a_plus"]:
+            reason = "推荐指数未达 A+（推荐表未收录）"
+        elif not item["long_paper"]:
+            reason = "会议短文（Extended Abstract）不计入"
+        elif not item["tags"]:
+            reason = f"署名角色不符合（本人为第 {item['position']} 作者）"
+        else:
+            reason = ""
+        item["exclude_reason"] = reason
+
     def order(seq: list[dict]) -> list[dict]:
         return sorted(seq, key=lambda i: (not i["featured"], -i["year_int"], i["title"]))
 
-    eligible = [i for i in items if i["year_int"] >= CORE_MIN_YEAR and i["a_plus"]]
-    main = [i for i in eligible if i["tags"] and i["long_paper"]]
-    pending = [i for i in eligible if not (i["tags"] and i["long_paper"])]
-    others = [i for i in items if not (i["year_int"] >= CORE_MIN_YEAR and i["a_plus"])]
-    return order(main), order(pending), order(others)
+    main = order([i for i in items if not i["exclude_reason"]])
+    others = order([i for i in items if i["exclude_reason"]])
+    return main, others
 
 
 def core_rows_html(items: list[dict], me_name: str, start: int = 1, with_note: bool = False) -> str:
     rows: list[str] = []
     for offset, item in enumerate(items):
         idx = start + offset
-        tags = "".join(f'<span class="tag">{esc(t)}</span>' for t in item.get("tags") or [])
+        tags = ""
+        if not with_note:  # 「其他（未计入）」段落不再显示署名标签，避免看起来像计入了
+            tags = "".join(f'<span class="tag">{esc(t)}</span>' for t in item.get("tags") or [])
         rate = f'<span class="badge ccf">{esc(item["rating"])}</span>' if item.get("rating") else ""
         chips = ""
         for badge in sorted(item["badges"], key=lambda b: (not b.startswith("CCF-"), b)):
@@ -955,13 +969,12 @@ def core_rows_html(items: list[dict], me_name: str, start: int = 1, with_note: b
             ccf_txt = f"，{item['ccf']}" if item.get("ccf") else ""
             pos = item.get("position")
             role_txt = "、".join(item.get("tags") or []) or (f"第 {pos} 作者" if pos else "—")
-            extra = "；会议短文（Extended Abstract）" if not item.get("long_paper") else ""
-            note = (
-                f'<div class="group-note">推荐指数：{esc(rate_txt)}{esc(ccf_txt)} · '
-                f"署名：{esc(role_txt)}{esc(extra)}</div>"
-            )
+            parts = [f"推荐指数：{rate_txt}{ccf_txt}", f"署名：{role_txt}"]
+            if item.get("exclude_reason"):
+                parts.append(f"未计入原因：{item['exclude_reason']}")
+            note = f'<div class="group-note">{" · ".join(parts)}</div>'
         rows.append(
-            f'<li><span class="num">[{idx}]</span><span class="ptitle">{esc(item["title"])}</span>。'
+            f'<li><span class="num">[{idx}]</span> <span class="ptitle">{esc(item["title"])}</span>。'
             f"{venue}{tail}。"
             f'<div class="pauth">{pub_authors_html(item, me_name)}</div>'
             f'<div class="pmeta">{tags}{rate}{chips}{pub_links_html(item)}{cite}</div>{note}</li>'
@@ -972,15 +985,16 @@ def core_rows_html(items: list[dict], me_name: str, start: int = 1, with_note: b
 def build_core_html() -> str:
     cfg = TARGETS["core_zh"]
     data = content_zh()
-    main, pending, others = prepare_core_items()
+    main, others = prepare_core_items()
     generated = datetime.now().strftime("%Y-%m-%d")
 
     criteria = (
         "筛选口径：① <b>2021 年及以后</b>发表（含在线发表）的期刊/会议论文；"
         "② 刊物/会议的<b>推荐指数 A+ 及以上</b>（依据课题组《AI&amp;DM&amp;NLP&amp;BioMed 刊物推荐表 2024.09》；"
         "推荐顺序 A+++ &gt; A++ &gt; A+ &gt; A &gt; A- &gt; B；CCF-A 类期刊与 CCF-A 类会议长文按表内口径计为 A+ 及以上）；"
-        "③ 署名角色为 <b>第一作者 / 共同第一作者 / 通讯作者 / 共同通讯作者 / 导师第一作者·本人第二作者</b> 之一。"
-        "预印本（arXiv）、会议短文（Extended Abstract）及其他推荐指数的论文不计入。"
+        "③ 署名角色为 <b>第一作者 / 共同第一作者 / 通讯作者 / 共同通讯作者 / 导师第一作者·本人第二作者</b> 之一"
+        "（导师指张颖教授、秦璐教授、王翰宸博士、王潇杨教授）。"
+        "预印本（arXiv）、<b>会议短文（Extended Abstract）</b>、以及一作非导师的合著论文均不计入。"
     )
     legend = (
         "标签：<span class=\"tag\">一作</span>第一作者　<span class=\"tag\">通讯作者</span>"
@@ -1015,16 +1029,12 @@ def build_core_html() -> str:
   <div class="criteria">{criteria}</div>
   <div class="legend">{legend}</div>
   <ul class="pubs pubs-full">
-{core_rows_html(main, data["name"])}
+{core_rows_html(main, AUTHOR_LINE_NAME)}
   </ul>
-
-  {h2("待确认（符合刊物等级与年份，署名/篇幅口径待核）") if pending else ""}
-  {f'<div class="group-note">以下论文的刊物等级与年份符合筛选口径，但署名角色（共同一作 / 共同通讯）或篇幅（长文 / 短文）需人工确认后计入。</div>' if pending else ""}
-  {f'<ul class="pubs pubs-full">{chr(10)}{core_rows_html(pending, data["name"], start=len(main) + 1, with_note=True)}{chr(10)}</ul>' if pending else ""}
 
   {h2("其他论文（2021 年起，未计入上述筛选）")}
   <ul class="pubs pubs-full">
-{core_rows_html(others, data["name"], start=len(main) + len(pending) + 1, with_note=True)}
+{core_rows_html(others, AUTHOR_LINE_NAME, start=len(main) + 1, with_note=True)}
   </ul>
 
   <div class="foot">
