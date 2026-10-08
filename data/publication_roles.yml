@@ -1,0 +1,43 @@
+# 署名角色事实表（用于生成「工商入职版」中文论文列表）
+#
+# 数据来源：OpenAlex works.authorships[].is_corresponding（2026-10-08 抓取）
+#   corresponding 为空数组 = OpenAlex 未标注通讯作者（多为数据缺失，需人工核对论文首页的通讯标记）
+#   其它角色（一作 / 导师一作·学生二作）由论文作者顺序 + supervisors 名单推导，不在这里重复登记。
+#
+# manual_tags：人工确认后填（例：["共同一作"]、["共同通讯"]），会直接显示在论文条目标签里。
+#   可用的标签：共同一作 / 共同通讯 / 通讯作者 / 一作 / 导师一作·学生二作
+
+supervisors:      # 判定「导师一作·学生二作」用（博导：张颖、秦璐、王翰宸；硕导：王潇杨）
+  - "Ying Zhang"
+  - "Lu Qin"
+  - "Hanchen Wang"
+  - "Xiaoyang Wang"
+
+papers:
+  "10.1109/tkde.2026.3689176":        # TKDE 2026 · MGDN
+    corresponding: []
+    manual_tags: []
+  "10.1109/tkde.2026.3735058":        # TKDE 2026 · SARL
+    corresponding: []
+    manual_tags: []
+  "10.1109/tkde.2024.3485127":        # TKDE 2024 · Temporal Insights
+    corresponding: []
+    manual_tags: []
+  "10.1109/tkde.2023.3279920":        # TKDE 2023 · Neural Similarity Search on Supergraph Containment
+    corresponding: []
+    manual_tags: []
+  "10.1145/3580305.3599836":          # KDD 2023 · Group-based Fraud Detection Network
+    corresponding: []
+    manual_tags: []
+  "10.1145/3709678":                  # SIGMOD 2025 · Deep Overlapping Community Search
+    corresponding: []
+    manual_tags: []                   # ⚠️ 待确认：是否共同一作 / 通讯作者（OpenAlex 无标注，且一作不是导师）
+  "10.1109/icde60146.2024.00486":     # ICDE 2024 · Neural Similarity Search（Extended Abstract）
+    corresponding: []
+    manual_tags: []                   # ⚠️ 待确认：Extended Abstract 是否计入（表内只给「长文」A+）
+  "10.1016/j.ins.2026.123228":        # Information Sciences 2026 · Finding critical users
+    corresponding: ["Jianke Yu"]
+    manual_tags: []                   # 通讯作者（OpenAlex 已标）
+  "10.1007/s11280-025-01354-y":       # World Wide Web 2025 · RIDA（一作，刊物低于 A+）
+    corresponding: ["Xijuan Liu"]
+    manual_tags: []

@@ -81,6 +81,19 @@ TARGETS: dict[str, dict] = {
         "lang": "zh",
         "kind": "pubs",
     },
+    # 工商入职专用：中文、按推荐表筛 A+ 及以上 + 署名角色限定
+    "core_zh": {
+        "html": STATIC_CV / "zh" / "publications-core" / "index.html",
+        "pdf": STATIC_CV / "zh" / "publications-core" / "Jianke-Yu-Core-Publications-zh.pdf",
+        "dir": STATIC_CV / "zh" / "publications-core",
+        "photo": "../../photo.jpg",
+        "html_lang": "zh-CN",
+        "pdf_href": "Jianke-Yu-Core-Publications-zh.pdf",
+        "alt_href": "../publications/",
+        "cv_href": "../../zh/",
+        "lang": "zh",
+        "kind": "core",
+    },
 }
 
 LABELS: dict[str, dict[str, str]] = {
@@ -599,6 +612,17 @@ body[data-lang="zh-CN"] .pubs-full .pauth, body[data-lang="zh-CN"] .pubs-full .p
 .badge.feat { background: #fff; border-color: var(--navy); color: var(--navy); font-weight: 600; }
 .group-note { font-size: 9pt; color: var(--ink-3); margin: -2.5px 0 4.5px; }
 
+/* ---------- 工商入职版：署名角色标签 ---------- */
+.tag {
+  display: inline-block; font-size: 7.9pt; font-weight: 700; line-height: 1.55;
+  border: 1px solid var(--navy); background: var(--navy); color: #fff;
+  border-radius: 3px; padding: 0 5px; margin-right: 4px; white-space: nowrap;
+}
+.tag.sec { background: #fff; color: var(--navy); }
+.criteria { font-size: 9.3pt; color: var(--ink-2); line-height: 1.5; margin: 0 0 6px; }
+.criteria b { color: var(--ink); }
+.legend { font-size: 8.8pt; color: var(--ink-3); margin: 0 0 6px; line-height: 1.45; }
+
 /* ---------- toolbar (screen only) ---------- */
 .toolbar {
   position: fixed; top: 10px; right: 12px; display: flex; gap: 8px; z-index: 9;
@@ -839,6 +863,180 @@ def build_publications_html(lang: str) -> str:
 """
 
 
+# ------------------------ 工商入职版：按《刊物推荐表》筛 A+ 及以上 + 署名角色打标
+CORE_MIN_YEAR = 2021
+
+
+def load_venue_ratings() -> dict[str, dict]:
+    data = load_yaml(ROOT / "data" / "venue_ratings.yml")
+    out: dict[str, dict] = {}
+    for kind in ("journals", "conferences"):
+        for name, meta in (data.get(kind) or {}).items():
+            out[str(name)] = dict(meta or {})
+    return out
+
+
+def load_roles() -> dict:
+    return load_yaml(ROOT / "data" / "publication_roles.yml")
+
+
+def rate_of(venue: str, ratings: dict[str, dict]) -> dict:
+    """先精确匹配，再互相包含匹配（推荐表里的名字可能比 OpenAlex 略短/略长）。"""
+    if venue in ratings:
+        return ratings[venue]
+    low = venue.lower()
+    for name, meta in ratings.items():
+        n = name.lower()
+        if n and (n in low or low in n):
+            return meta
+    return {"rating": None, "ccf": None, "in_table": False, "note": "推荐表未收录"}
+
+
+def role_tags(item: dict, roles: dict) -> list[str]:
+    """按署名位置 + 通讯作者标注 + 人工标签，得出该论文的角色标签。"""
+    supervisors = set(roles.get("supervisors") or [])
+    info = (roles.get("papers") or {}).get(item.get("doi") or "", {}) or {}
+    tags: list[str] = []
+    if item["position"] == 1:
+        tags.append("一作")
+    if "Jianke Yu" in (info.get("corresponding") or []):
+        tags.append("通讯作者")
+    authors = item.get("authors") or []
+    if item["position"] == 2 and authors and authors[0] in supervisors:
+        tags.append("导师一作·学生二作")
+    for tag in info.get("manual_tags") or []:
+        if tag not in tags:
+            tags.append(tag)
+    return tags
+
+
+def prepare_core_items() -> tuple[list[dict], list[dict], list[dict]]:
+    """返回 (主表, 待确认, 其他参考)。"""
+    ratings = load_venue_ratings()
+    roles = load_roles()
+    items = load_publications()
+    for item in items:
+        meta = rate_of(item["venue"], ratings)
+        item["rating"] = meta.get("rating")
+        item["ccf"] = meta.get("ccf")
+        item["rate_note"] = meta.get("note") or ""
+        item["tags"] = role_tags(item, roles)
+        item["year_int"] = int(item["year"] or 0)
+        item["long_paper"] = "extended abstract" not in item["title"].lower()
+        item["a_plus"] = str(item["rating"] or "").startswith("A+")
+
+    def order(seq: list[dict]) -> list[dict]:
+        return sorted(seq, key=lambda i: (not i["featured"], -i["year_int"], i["title"]))
+
+    eligible = [i for i in items if i["year_int"] >= CORE_MIN_YEAR and i["a_plus"]]
+    main = [i for i in eligible if i["tags"] and i["long_paper"]]
+    pending = [i for i in eligible if not (i["tags"] and i["long_paper"])]
+    others = [i for i in items if not (i["year_int"] >= CORE_MIN_YEAR and i["a_plus"])]
+    return order(main), order(pending), order(others)
+
+
+def core_rows_html(items: list[dict], me_name: str, start: int = 1, with_note: bool = False) -> str:
+    rows: list[str] = []
+    for offset, item in enumerate(items):
+        idx = start + offset
+        tags = "".join(f'<span class="tag">{esc(t)}</span>' for t in item.get("tags") or [])
+        rate = f'<span class="badge ccf">{esc(item["rating"])}</span>' if item.get("rating") else ""
+        chips = ""
+        for badge in sorted(item["badges"], key=lambda b: (not b.startswith("CCF-"), b)):
+            css = "badge ccf" if badge.startswith("CCF-") else "badge"
+            chips += f'<span class="{css}">{esc(localize_badge(badge, "zh"))}</span>'
+        cites = int(item.get("cited_by") or 0)
+        cite = f'<span class="cite">{cites} 次被引</span>' if cites else ""
+        venue = f'<span class="venue">{esc(item["venue"])}</span>' if item["venue"] else ""
+        tail = f"，{esc(item['year'])}" if item["year"] else ""
+        note = ""
+        if with_note:
+            rate_txt = item.get("rating") or "推荐表未收录"
+            ccf_txt = f"，{item['ccf']}" if item.get("ccf") else ""
+            pos = item.get("position")
+            role_txt = "、".join(item.get("tags") or []) or (f"第 {pos} 作者" if pos else "—")
+            extra = "；会议短文（Extended Abstract）" if not item.get("long_paper") else ""
+            note = (
+                f'<div class="group-note">推荐指数：{esc(rate_txt)}{esc(ccf_txt)} · '
+                f"署名：{esc(role_txt)}{esc(extra)}</div>"
+            )
+        rows.append(
+            f'<li><span class="num">[{idx}]</span><span class="ptitle">{esc(item["title"])}</span>。'
+            f"{venue}{tail}。"
+            f'<div class="pauth">{pub_authors_html(item, me_name)}</div>'
+            f'<div class="pmeta">{tags}{rate}{chips}{pub_links_html(item)}{cite}</div>{note}</li>'
+        )
+    return "\n".join(rows)
+
+
+def build_core_html() -> str:
+    cfg = TARGETS["core_zh"]
+    data = content_zh()
+    main, pending, others = prepare_core_items()
+    generated = datetime.now().strftime("%Y-%m-%d")
+
+    criteria = (
+        "筛选口径：① <b>2021 年及以后</b>发表（含在线发表）的期刊/会议论文；"
+        "② 刊物/会议的<b>推荐指数 A+ 及以上</b>（依据课题组《AI&amp;DM&amp;NLP&amp;BioMed 刊物推荐表 2024.09》；"
+        "推荐顺序 A+++ &gt; A++ &gt; A+ &gt; A &gt; A- &gt; B；CCF-A 类期刊与 CCF-A 类会议长文按表内口径计为 A+ 及以上）；"
+        "③ 署名角色为 <b>第一作者 / 共同第一作者 / 通讯作者 / 共同通讯作者 / 导师第一作者·本人第二作者</b> 之一。"
+        "预印本（arXiv）、会议短文（Extended Abstract）及其他推荐指数的论文不计入。"
+    )
+    legend = (
+        "标签：<span class=\"tag\">一作</span>第一作者　<span class=\"tag\">通讯作者</span>"
+        "<span class=\"tag\">导师一作·学生二作</span><span class=\"tag\">共同一作 / 共同通讯</span>（人工确认后标注）　"
+        "│ 等级：<span class=\"badge ccf\">A+++</span><span class=\"badge ccf\">A+</span> = 推荐表推荐指数；"
+        "CCF-A/B/C = CCF 推荐目录；中科院 N 区 / JCR Qn = 期刊分区。"
+    )
+
+    return f"""<!DOCTYPE html>
+<!-- GENERATED by scripts/build_cv.py (core-zh) — 请勿手工编辑。
+     筛选规则：data/venue_ratings.yml（刊物推荐表）+ data/publication_roles.yml（通讯作者事实）
+     + content/publications/**（论文与作者顺序）。重新生成：python3 scripts/build_cv.py --only core --pdf
+     生成日期 {generated} -->
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{esc(data["name"])} — 代表性论文（入职材料）</title>
+<style>{CSS}</style>
+</head>
+<body data-lang="zh-CN">
+<div class="toolbar no-print">
+  <button onclick="window.print()">打印 · 存为 PDF</button>
+  <a href="{esc(cfg['pdf_href'])}">下载 PDF</a>
+  <a href="{esc(cfg['cv_href'])}">{esc(LABELS["zh"]["back_cv"])}</a>
+  <a href="{esc(cfg['alt_href'])}">完整论文列表</a>
+</div>
+<div class="sheet">
+  {page_header_html(cfg, data)}
+
+  {h2("代表性论文（A+ 及以上 · 限定署名角色）")}
+  <div class="criteria">{criteria}</div>
+  <div class="legend">{legend}</div>
+  <ul class="pubs pubs-full">
+{core_rows_html(main, data["name"])}
+  </ul>
+
+  {h2("待确认（符合刊物等级与年份，署名/篇幅口径待核）") if pending else ""}
+  {f'<div class="group-note">以下论文的刊物等级与年份符合筛选口径，但署名角色（共同一作 / 共同通讯）或篇幅（长文 / 短文）需人工确认后计入。</div>' if pending else ""}
+  {f'<ul class="pubs pubs-full">{chr(10)}{core_rows_html(pending, data["name"], start=len(main) + 1, with_note=True)}{chr(10)}</ul>' if pending else ""}
+
+  {h2("其他论文（2021 年起，未计入上述筛选）")}
+  <ul class="pubs pubs-full">
+{core_rows_html(others, data["name"], start=len(main) + len(pending) + 1, with_note=True)}
+  </ul>
+
+  <div class="foot">
+    <span>生成于 {esc(generated)}</span>
+    <span>共 {len(main)} 篇符合筛选口径 · 完整列表：{esc(SITE)}/cv/zh/publications/</span>
+  </div>
+</div>
+</body>
+</html>
+"""
+
+
 def build_html(lang: str) -> str:
     cfg = TARGETS[lang]
     labels = LABELS[lang]
@@ -983,9 +1181,9 @@ def main() -> int:
     parser.add_argument("--lang", choices=("en", "zh", "both"), default="both", help="生成哪一版")
     parser.add_argument(
         "--only",
-        choices=("all", "cv", "pubs"),
+        choices=("all", "cv", "pubs", "core"),
         default="all",
-        help="all=简历+论文列表；cv=只生成简历；pubs=只生成完整论文列表",
+        help="all=简历+论文列表+入职版；cv=只生成简历；pubs=只生成完整论文列表；core=只生成工商入职版",
     )
     args = parser.parse_args()
 
@@ -998,12 +1196,20 @@ def main() -> int:
         keys += list(langs)
     if args.only in ("all", "pubs"):
         keys += [f"pubs_{lang}" for lang in langs]
+    if args.only in ("all", "core"):
+        keys += ["core_zh"]
 
     rc = 0
     for key in keys:
         cfg = TARGETS[key]
         cfg["dir"].mkdir(parents=True, exist_ok=True)
-        html = build_publications_html(cfg["lang"]) if cfg["kind"] == "pubs" else build_html(key)
+        kind = cfg["kind"]
+        if kind == "pubs":
+            html = build_publications_html(cfg["lang"])
+        elif kind == "core":
+            html = build_core_html()
+        else:
+            html = build_html(key)
         cfg["html"].write_text(html, encoding="utf-8")
         print(f"[html] {cfg['html'].relative_to(ROOT)}  {cfg['html'].stat().st_size / 1024:.0f} KB")
         if args.pdf:

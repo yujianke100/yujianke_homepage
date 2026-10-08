@@ -1,0 +1,90 @@
+# 刊物 / 会议推荐指数（依据课题组《AI&DM&NLP&BioMed 刊物推荐表 2024.09》，作者 hua zhang，2024-09-23）
+#
+# 表内推荐顺序：A+++ > A++ > A+ > A > A- > B
+#   表内原文口径：
+#     (2) 优先考虑 A+ 及以上刊物（包括 CCF A 类顶会），原则上不考虑 A- 与 B
+#     「其它 CCF A 类期刊」的推荐指数为 >= A+；「其它 CCF A 类会议(长文)」为 A+
+#   因此判定规则（本文件按此填写）：
+#     - 表内明确列出的 → 照抄
+#     - 未列出但是 CCF-A 期刊 → >= A+（记为 "A+（其它 CCF A 类期刊）"）
+#     - 未列出但是 CCF-A 会议且为长文 → A+（记为 "A+（其它 CCF A 类会议长文）"）
+#     - CCF-B/C 且表内未列出 → 低于 A+，记为 "未收录"，不计入
+#
+# rating: null / 字符串。凡是低于 A+ 的论文，在「工商入职版」列表里不进主表。
+
+journals:
+  "IEEE Transactions on Knowledge and Data Engineering":
+    rating: "A+++"
+    ccf: "CCF-A"
+    cas: "中科院 2 区"
+    in_table: true
+  "Information Sciences":
+    rating: "A+"
+    ccf: "CCF-B"
+    cas: "中科院 1 区"
+    in_table: true
+  "World Wide Web":
+    rating: null
+    ccf: "CCF-B"
+    cas: "中科院 4 区"
+    in_table: false
+    note: "表内未收录（CCF-B），低于 A+"
+  "Data Science and Engineering":
+    rating: null
+    ccf: "CCF-B"
+    cas: "中科院 1 区"
+    in_table: false
+    note: "表内未收录，低于 A+"
+
+conferences:
+  "ACM SIGKDD Conference on Knowledge Discovery and Data Mining":
+    rating: "A+"
+    ccf: "CCF-A"
+    short: "KDD"
+    in_table: true
+  "ACM SIGMOD Conference":
+    rating: "A+"
+    ccf: "CCF-A"
+    short: "SIGMOD"
+    in_table: false
+    note: "表内「其它 CCF A 类会议(长文) = A+」"
+  "IEEE International Conference on Data Engineering":
+    rating: "A+"
+    ccf: "CCF-A"
+    short: "ICDE"
+    in_table: false
+    note: "CCF-A 会议；表内只给『长文』A+，本条为 Extended Abstract（短文）"
+  "International Conference on Advanced Data Mining and Applications":
+    rating: null
+    ccf: "CCF-C"
+    short: "ADMA"
+    in_table: false
+  "Pacific-Asia Conference on Knowledge Discovery and Data Mining":
+    rating: null
+    ccf: "CCF-C"
+    short: "PAKDD"
+    in_table: false
+  "Asia Pacific Web Conference (APWeb-WAIM)":
+    rating: null
+    ccf: "CCF-C"
+    short: "APWeb-WAIM"
+    in_table: false
+  "Australasian Database Conference":
+    rating: null
+    ccf: "CCF-C"
+    short: "ADC"
+    in_table: false
+  "IEEE International Conference on High Performance Computing":
+    rating: null
+    ccf: "CCF-C"
+    short: "HPCC"
+    in_table: false
+  "FLINS-ISKE":
+    rating: null
+    ccf: null
+    in_table: false
+  "arXiv preprint":
+    rating: null
+    ccf: null
+    in_table: false
+    note: "预印本，不计"
