@@ -1135,8 +1135,7 @@ def build_gjgsu_html() -> str:
     highlights = []
     if n_fa_ppp:
         highlights.append(
-            f'<span class="tag">一作</span><b>第一作者 A+++ 类论文 {n_fa_ppp} 篇</b>'
-            "（IEEE TKDE，数据挖掘与数据库领域顶级期刊，中科院 1 区 Top）"
+            f'<span class="tag">一作</span><b>第一作者 A+++ 类论文 {n_fa_ppp} 篇</b>（IEEE TKDE）'
         )
     if n_fa_p:
         highlights.append(
@@ -1145,7 +1144,7 @@ def build_gjgsu_html() -> str:
     if n_corr:
         highlights.append(
             f'<span class="tag sec">通讯作者</span><b>通讯作者 A+ 类论文 {n_corr} 篇</b>'
-            "（Information Sciences，中科院 2 区）"
+            "（Information Sciences）"
         )
     if n_sup:
         highlights.append(
@@ -1157,10 +1156,8 @@ def build_gjgsu_html() -> str:
     )
     hl_html = (
         '<div class="hl"><ul>' + "".join(f"<li>{h}</li>" for h in highlights) + "</ul>"
-        f'<div class="sum">合计：代表性论文 <b>{len(main)}</b> 篇（A+ 及以上、署名角色限定）；'
-        f'另 <b>{len(others)}</b> 篇其他论文、<b>{len(preprints)}</b> 篇预印本，均在本页完整列出；'
-        f'近五年论文合计 <b>{len(main) + len(others) + len(preprints)}</b> 篇'
-        f'（其中已发表 {len(main) + len(others)} 篇、预印本 {len(preprints)} 篇）；'
+        f'<div class="sum">合计：代表性论文 <b>{len(main)}</b> 篇，其他论文 <b>{len(others)}</b> 篇，'
+        f'均在下方完整列出；论文合计 <b>{len(main) + len(others)}</b> 篇；'
         f'总被引 <b>{citations}</b> 次。</div></div>'
     )
 
@@ -1221,20 +1218,16 @@ def build_gjgsu_html() -> str:
   {entries_html(data["experience"])}
 
   <div class="page-break"></div>
-  {h2(f"论文（代表 {len(main)} 篇 · 其他 {len(others)} 篇 · 预印本 {len(preprints)} 篇）")}
+  {h2(f"代表性论文（{len(main)} 篇）")}
   <div class="legend">{legend}</div>
   <ul class="pubs pubs-full">
 {core_rows_html(main, AUTHOR_LINE_NAME)}
   </ul>
 
-  {h2("其他论文（2021 年起，未计入主表）")}
+  {h2(f"其他论文（{len(others)} 篇，未计入上表）")}
   <ul class="pubs pubs-full">
 {core_rows_html(others, AUTHOR_LINE_NAME, start=len(main) + 1, with_note=True)}
   </ul>
-
-  {h2("预印本（未正式发表）") if preprints else ""}
-  {preprint_note(preprints)}
-  {f'<ul class="pubs pubs-full">{chr(10)}{core_rows_html(preprints, AUTHOR_LINE_NAME, start=len(main) + len(others) + 1, with_note=True)}{chr(10)}</ul>' if preprints else ""}
 
   {h2(LABELS["zh"]["scholarships"])}
   {entries_html(data["scholarships"])}
