@@ -113,7 +113,7 @@ sections:
 
         **Research Infrastructure**
 
-        - Platform Administrator, research computing platform of Prof. Ying Zhang & Prof. Xiaoyang Wang's team, Zhejiang Gongshang University
+        - Platform Administrator, research computing platform of Prof. Ying Zhang & Prof. Xiaoyang Wang's team, Zhejiang Gongshang University (since 2021)
 
         **Community**
 
