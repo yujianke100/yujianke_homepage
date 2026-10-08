@@ -94,11 +94,12 @@ experience:
       Research on graph learning methods for industrial data systems.
   - role: Guest Lecturer
     org: University of Technology Sydney
-    start: 2025-07-28
-    end: 2025-10-24
+    start: 2025-08-01
+    end: 2025-08-31
     summary: |
-      Guest lecturer for UTS 43023 Emerging Topics in AI (Spring session 2025:
-      28 July – 24 October; UTS "Spring session" runs in the second half of the year).
+      Invited guest lecturer for UTS 43023 Emerging Topics in AI, delivering the
+      Large-Scale Graph topic block and guiding students through the implementation
+      of graph models (confirmed by a UTS letter of confirmation, 27 Aug 2025).
   - role: Research Intern
     org: DAMO Academy / Alibaba Cloud, Alibaba Group
     start: 2022-07-18

@@ -206,6 +206,8 @@ def fmt_period(start, end, present: str = "Present") -> str:
         except ValueError:
             pass
         return f"{left} – {present}"
+    if left == right:
+        return left                     # 起止同月（如 2025.08–2025.08）只显示一次
     return f"{left} – {right or present}"
 
 
