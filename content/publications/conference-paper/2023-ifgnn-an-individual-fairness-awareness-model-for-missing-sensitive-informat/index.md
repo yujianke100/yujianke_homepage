@@ -16,7 +16,7 @@ publication:
   name: "Australasian Database Conference"
   year: 2023
 peer_reviewed: true
-open_access: false
+open_access: true
 cited_by: 0
 featured: false
 hugoblox:
