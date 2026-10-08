@@ -912,8 +912,8 @@ def role_tags(item: dict, roles: dict) -> list[str]:
     return tags
 
 
-def prepare_core_items() -> tuple[list[dict], list[dict]]:
-    """返回 (主表, 其他)。其他里的每条都带 exclude_reason（为什么没计入）。"""
+def prepare_core_items() -> tuple[list[dict], list[dict], list[dict]]:
+    """返回 (主表, 其他已发表, 预印本)。后两者每条都带 exclude_reason。"""
     ratings = load_venue_ratings()
     roles = load_roles()
     items = load_publications()
@@ -926,8 +926,12 @@ def prepare_core_items() -> tuple[list[dict], list[dict]]:
         item["year_int"] = int(item["year"] or 0)
         item["long_paper"] = "extended abstract" not in item["title"].lower()
         item["a_plus"] = str(item["rating"] or "").startswith("A+")
+        # 预印本（arXiv 等）单独成段，不与已发表论文混排
+        item["is_preprint"] = item["folder"] not in ("journal-article", "conference-paper")
 
-        if item["year_int"] < CORE_MIN_YEAR:
+        if item["is_preprint"]:
+            reason = "预印本（未正式发表）"
+        elif item["year_int"] < CORE_MIN_YEAR:
             reason = f"{CORE_MIN_YEAR} 年前发表"
         elif not item["a_plus"]:
             reason = "推荐指数未达 A+（推荐表未收录）"
@@ -943,8 +947,9 @@ def prepare_core_items() -> tuple[list[dict], list[dict]]:
         return sorted(seq, key=lambda i: (not i["featured"], -i["year_int"], i["title"]))
 
     main = order([i for i in items if not i["exclude_reason"]])
-    others = order([i for i in items if i["exclude_reason"]])
-    return main, others
+    others = order([i for i in items if i["exclude_reason"] and not i["is_preprint"]])
+    preprints = order([i for i in items if i["exclude_reason"] and i["is_preprint"]])
+    return main, others, preprints
 
 
 def core_rows_html(items: list[dict], me_name: str, start: int = 1, with_note: bool = False) -> str:
@@ -985,7 +990,7 @@ def core_rows_html(items: list[dict], me_name: str, start: int = 1, with_note: b
 def build_core_html() -> str:
     cfg = TARGETS["core_zh"]
     data = content_zh()
-    main, others = prepare_core_items()
+    main, others, preprints = prepare_core_items()
     generated = datetime.now().strftime("%Y-%m-%d")
 
     criteria = (
@@ -1036,6 +1041,10 @@ def build_core_html() -> str:
   <ul class="pubs pubs-full">
 {core_rows_html(others, AUTHOR_LINE_NAME, start=len(main) + 1, with_note=True)}
   </ul>
+
+  {h2("预印本（未正式发表）") if preprints else ""}
+  {f'<div class="group-note">以下为 arXiv 预印本，尚未正式发表，单独列出、不计入上述统计。</div>' if preprints else ""}
+  {f'<ul class="pubs pubs-full">{chr(10)}{core_rows_html(preprints, AUTHOR_LINE_NAME, start=len(main) + len(others) + 1, with_note=True)}{chr(10)}</ul>' if preprints else ""}
 
   <div class="foot">
     <span>生成于 {esc(generated)}</span>
