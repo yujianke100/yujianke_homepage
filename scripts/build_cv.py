@@ -928,6 +928,8 @@ def prepare_core_items() -> tuple[list[dict], list[dict], list[dict]]:
         item["a_plus"] = str(item["rating"] or "").startswith("A+")
         # 预印本（arXiv 等）单独成段，不与已发表论文混排
         item["is_preprint"] = item["folder"] not in ("journal-article", "conference-paper")
+        # 会议短文（Extended Abstract）在工商版里整条不列（用户要求：不进任何分段）
+        item["hidden"] = not item["long_paper"]
 
         if item["is_preprint"]:
             reason = "预印本（未正式发表）"
@@ -947,8 +949,12 @@ def prepare_core_items() -> tuple[list[dict], list[dict], list[dict]]:
         return sorted(seq, key=lambda i: (not i["featured"], -i["year_int"], i["title"]))
 
     main = order([i for i in items if not i["exclude_reason"]])
-    others = order([i for i in items if i["exclude_reason"] and not i["is_preprint"]])
-    preprints = order([i for i in items if i["exclude_reason"] and i["is_preprint"]])
+    others = order(
+        [i for i in items if i["exclude_reason"] and not i["is_preprint"] and not i["hidden"]]
+    )
+    preprints = order(
+        [i for i in items if i["exclude_reason"] and i["is_preprint"] and not i["hidden"]]
+    )
     return main, others, preprints
 
 
