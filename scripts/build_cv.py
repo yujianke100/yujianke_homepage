@@ -994,7 +994,8 @@ def prepare_core_items() -> tuple[list[dict], list[dict], list[dict]]:
     return main, others, preprints
 
 
-def core_rows_html(items: list[dict], me_name: str, start: int = 1, with_note: bool = False) -> str:
+def core_rows_html(items: list[dict], me_name: str, start: int = 1, with_note: bool = False,
+                   show_reason: bool = True) -> str:
     rows: list[str] = []
     for offset, item in enumerate(items):
         idx = start + offset
@@ -1019,7 +1020,7 @@ def core_rows_html(items: list[dict], me_name: str, start: int = 1, with_note: b
             pos = item.get("position")
             role_txt = "、".join(item.get("tags") or []) or (f"第 {pos} 作者" if pos else "—")
             parts = [f"推荐指数：{rate_txt}{ccf_txt}", f"署名：{role_txt}"]
-            if item.get("exclude_reason"):
+            if show_reason and item.get("exclude_reason"):
                 parts.append(f"未计入原因：{item['exclude_reason']}")
             note = f'<div class="group-note">{" · ".join(parts)}</div>'
         rows.append(
@@ -1166,6 +1167,11 @@ def build_gjgsu_html() -> str:
         "CCF-A/B/C = CCF 推荐目录；中科院 N 区 / JCR Qn = 期刊分区。"
     )
 
+    acts = list(data["talks"]) + list(data["service"]) + [
+        t for t in data["teaching"] if t["t"] != "客座讲师"      # 客座讲师已在「工作与科研经历」列出
+    ]
+    acts_html = entries_compact_html(acts)
+
     contact = " · ".join(
         f'<span><span class="k">{esc(i["key"])}</span>'
         + (f'<a href="{esc(i["url"])}">{esc(i["label"])}</a>' if i["url"] else esc(i["label"]))
@@ -1226,7 +1232,7 @@ def build_gjgsu_html() -> str:
 
   {h2(f"其他论文（{len(others)} 篇，未计入上表）")}
   <ul class="pubs pubs-full">
-{core_rows_html(others, AUTHOR_LINE_NAME, start=len(main) + 1, with_note=True)}
+{core_rows_html(others, AUTHOR_LINE_NAME, start=len(main) + 1, with_note=True, show_reason=False)}
   </ul>
 
   {h2(LABELS["zh"]["scholarships"])}
@@ -1235,18 +1241,8 @@ def build_gjgsu_html() -> str:
   {h2(LABELS["zh"]["honors"])}
   {entries_html(data["awards"])}
 
-  <div class="cols">
-    <div>
-      {h2(LABELS["zh"]["activities"])}
-      {entries_compact_html(data["talks"])}
-      {entries_compact_html(data["service"])}
-    </div>
-    <div>
-      {h2(LABELS["zh"]["teaching"])}
-      {entries_compact_html(data["teaching"])}
-    </div>
-  </div>
-
+  {h2("学术活动与教学")}
+  {acts_html}
   <div class="foot">
     <span>{esc(LABELS["zh"]["updated"])} {esc(generated)}</span>
     <span>完整论文列表：{esc(SITE)}/cv/zh/publications/</span>
