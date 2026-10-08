@@ -42,6 +42,8 @@ TARGETS: dict[str, dict] = {
         "html_lang": "en",
         "pdf_href": "Jianke-Yu-CV.pdf",
         "alt_href": "zh/",
+        "pubs_href": "publications/",
+        "kind": "cv",
     },
     "zh": {
         "html": STATIC_CV / "zh" / "index.html",
@@ -51,6 +53,33 @@ TARGETS: dict[str, dict] = {
         "html_lang": "zh-CN",
         "pdf_href": "Jianke-Yu-CV-zh.pdf",
         "alt_href": "../",
+        "pubs_href": "publications/",
+        "kind": "cv",
+    },
+    # 完整论文列表（与简历同版式）：/cv/publications/ 与 /cv/zh/publications/
+    "pubs_en": {
+        "html": STATIC_CV / "publications" / "index.html",
+        "pdf": STATIC_CV / "publications" / "Jianke-Yu-Publications.pdf",
+        "dir": STATIC_CV / "publications",
+        "photo": "../photo.jpg",
+        "html_lang": "en",
+        "pdf_href": "Jianke-Yu-Publications.pdf",
+        "alt_href": "../zh/publications/",
+        "cv_href": "../",
+        "lang": "en",
+        "kind": "pubs",
+    },
+    "pubs_zh": {
+        "html": STATIC_CV / "zh" / "publications" / "index.html",
+        "pdf": STATIC_CV / "zh" / "publications" / "Jianke-Yu-Publications-zh.pdf",
+        "dir": STATIC_CV / "zh" / "publications",
+        "photo": "../../photo.jpg",
+        "html_lang": "zh-CN",
+        "pdf_href": "Jianke-Yu-Publications-zh.pdf",
+        "alt_href": "../../publications/",
+        "cv_href": "../../zh/",
+        "lang": "zh",
+        "kind": "pubs",
     },
 }
 
@@ -73,6 +102,16 @@ LABELS: dict[str, dict[str, str]] = {
         "teaching": "Teaching",
         "skills": "Skills",
         "first_author": "1st author",
+        # —— 完整论文列表页（/cv/publications/）——
+        "pubs_doctitle": "Publication List",
+        "pubs_intro": "Full list of peer-reviewed publications and preprints.",
+        "pubs_button": "Publications",
+        "journals": "Journal Articles",
+        "conferences": "Conference Papers",
+        "preprints": "Preprints",
+        "citations": "citations",
+        "featured": "Featured",
+        "back_cv": "← CV",
         "updated": "Updated",
         "full_list": "Full list",
         "present": "Present",
@@ -95,6 +134,16 @@ LABELS: dict[str, dict[str, str]] = {
         "teaching": "教学工作",
         "skills": "技能",
         "first_author": "第一作者",
+        # —— 完整论文列表页（/cv/zh/publications/）——
+        "pubs_doctitle": "论文列表",
+        "pubs_intro": "同行评审论文与预印本完整列表。",
+        "pubs_button": "完整论文列表",
+        "journals": "期刊论文",
+        "conferences": "会议论文",
+        "preprints": "预印本",
+        "citations": "被引",
+        "featured": "代表论文",
+        "back_cv": "← 简历",
         "updated": "更新于",
         "full_list": "完整列表",
         "present": "至今",
@@ -261,6 +310,9 @@ def load_publications() -> list[dict]:
                 ],
                 "featured": bool(fm.get("featured")),
                 "cited_by": fm.get("cited_by"),
+                "authors": [clean(a) for a in authors],
+                "doi": ((fm.get("hugoblox") or {}).get("ids") or {}).get("doi") or "",
+                "arxiv": ((fm.get("hugoblox") or {}).get("ids") or {}).get("arxiv") or "",
             }
         )
     return items
@@ -533,6 +585,20 @@ body[data-lang="zh-CN"] .skill { grid-template-columns: 72px 1fr; }
 }
 .page-break { break-before: page; page-break-before: always; }
 
+/* ---------- 完整论文列表页（/cv/publications/）---------- */
+.pubs-full li { margin-bottom: 5px; }
+body[data-lang="zh-CN"] .pubs-full li { margin-bottom: 4px; line-height: 1.5; }
+body[data-lang="zh-CN"] .pubstats, body[data-lang="zh-CN"] .group-note { line-height: 1.45; }
+body[data-lang="zh-CN"] .pubs-full .pauth, body[data-lang="zh-CN"] .pubs-full .pmeta { line-height: 1.42; }
+.ptitle { font-weight: 700; }
+.pauth { color: var(--ink-2); font-size: 9.3pt; margin-top: .6px; }
+.pmeta { margin-top: 1.4px; }
+.pmeta .badge { margin-left: 0; margin-right: 4px; }
+.cite { color: var(--ink-3); font-size: 8.6pt; margin-left: 8px; }
+.plink { font-size: 8.6pt; color: var(--navy); border-bottom: .5px solid var(--rule); margin-left: 7px; }
+.badge.feat { background: #fff; border-color: var(--navy); color: var(--navy); font-weight: 600; }
+.group-note { font-size: 9pt; color: var(--ink-3); margin: -2.5px 0 4.5px; }
+
 /* ---------- toolbar (screen only) ---------- */
 .toolbar {
   position: fixed; top: 10px; right: 12px; display: flex; gap: 8px; z-index: 9;
@@ -619,6 +685,160 @@ def pubs_block(cfg: dict, lang: str) -> str:
     return f'<div class="pubstats">{esc(summary)}</div>\n<ul class="pubs">\n' + "\n".join(rows) + "\n</ul>"
 
 
+# ------------------------------------------- 完整论文列表页（与简历同版式）
+def pubs_page_summary(stats: dict, lang: str) -> str:
+    peer = stats["total"] - stats["others"]
+    if lang == "zh":
+        extra = f"，另有预印本 {stats['others']} 篇" if stats["others"] else ""
+        return (
+            f"同行评审论文 {peer} 篇（SCI 期刊 {stats['journals']} 篇，其中 JCR Q1 {stats['q1']} 篇；"
+            f"会议 {stats['conferences']} 篇）{extra} —— CCF-A {stats['ccf_a']} 篇、CCF-B {stats['ccf_b']} 篇、"
+            f"CCF-C {stats['ccf_c']} 篇；第一作者 {stats['first_author']} 篇；总被引 {stats['citations']} 次。"
+        )
+    extra = f", plus {stats['others']} preprint" if stats["others"] else ""
+    return (
+        f"{peer} peer-reviewed papers ({stats['journals']} SCI journal papers, {stats['q1']} in JCR Q1; "
+        f"{stats['conferences']} conference papers){extra} — {stats['ccf_a']} CCF-A, {stats['ccf_b']} CCF-B, "
+        f"{stats['ccf_c']} CCF-C; {stats['first_author']} first-author; {stats['citations']} citations."
+    )
+
+
+def pub_authors_html(item: dict, me_name: str) -> str:
+    out = []
+    for author in item.get("authors") or []:
+        if str(author).strip().lower() == "me":
+            out.append(f"<b>{esc(me_name)}</b>")
+        else:
+            out.append(esc(author))
+    return ", ".join(out)
+
+
+def pub_links_html(item: dict) -> str:
+    links = ""
+    if item.get("doi"):
+        links += f'<a class="plink" href="https://doi.org/{esc(item["doi"])}">DOI</a>'
+    if item.get("arxiv"):
+        links += f'<a class="plink" href="https://arxiv.org/abs/{esc(item["arxiv"])}">arXiv</a>'
+    return links
+
+
+def pub_list_rows(items: list[dict], lang: str, labels: dict, me_name: str, start: int = 1) -> tuple[str, int]:
+    """整列表条目：编号 + 标题/期刊/年份 + 作者 + 徽章/DOI/被引。返回 (html, 下一个可用编号)。"""
+    rows: list[str] = []
+    for offset, item in enumerate(items):
+        idx = start + offset
+        marks = f'<span class="badge fa">{esc(labels["first_author"])}</span>' if item["position"] == 1 else ""
+        if item.get("featured"):
+            marks += f'<span class="badge feat">{esc(labels["featured"])}</span>'
+        chips = ""
+        for badge in sorted(item["badges"], key=lambda b: (not b.startswith("CCF-"), b)):
+            css = "badge ccf" if badge.startswith("CCF-") else "badge"
+            chips += f'<span class="{css}">{esc(localize_badge(badge, lang))}</span>'
+        cites = int(item.get("cited_by") or 0)
+        cite = f'<span class="cite">{cites} {esc(labels["citations"])}</span>' if cites else ""
+        venue = f'<span class="venue">{esc(item["venue"])}</span>' if item["venue"] else ""
+        tail = f", {esc(item['year'])}" if item["year"] else ""
+        rows.append(
+            f'<li><span class="num">[{idx}]</span><span class="ptitle">{esc(item["title"])}</span>. '
+            f"{venue}{tail}."
+            f'<div class="pauth">{pub_authors_html(item, me_name)}</div>'
+            f'<div class="pmeta">{marks}{chips}{pub_links_html(item)}{cite}</div></li>'
+        )
+    return "\n".join(rows), start + len(items)
+
+
+def page_header_html(cfg: dict, data: dict) -> str:
+    """与简历完全一致的头部（照片 + 姓名 + 角色 + 联系方式）。"""
+    contact = " · ".join(
+        f'<span><span class="k">{esc(i["key"])}</span>'
+        + (f'<a href="{esc(i["url"])}">{esc(i["label"])}</a>' if i["url"] else esc(i["label"]))
+        + "</span>"
+        for i in data["contact"]
+    )
+    photo = (
+        f'<div class="photo"><img src="{esc(cfg["photo"])}" alt="{esc(data["name"])}"></div>'
+        if PHOTO.exists()
+        else ""
+    )
+    return (
+        "<header>\n    " + photo + '\n    <div class="who">\n'
+        f'      <h1>{esc(data["name"])}<span class="alt">{esc(data["alt"])}</span></h1>\n'
+        f'      <div class="role">{esc(data["role"])}</div>\n'
+        f'      <div class="where">{esc(data["location"])}</div>\n'
+        f'      <div class="contact">{contact}</div>\n'
+        "    </div>\n  </header>"
+    )
+
+
+def build_publications_html(lang: str) -> str:
+    cfg = TARGETS[f"pubs_{lang}"]
+    labels = LABELS[lang]
+    data = content_en() if lang == "en" else content_zh()
+    generated = datetime.now().strftime("%d %b %Y") if lang == "en" else datetime.now().strftime("%Y-%m-%d")
+
+    items = load_publications()
+    by_type = {
+        "journals": [i for i in items if i["folder"] == "journal-article"],
+        "conferences": [i for i in items if i["folder"] == "conference-paper"],
+    }
+    by_type["preprints"] = [
+        i for i in items if i["folder"] not in ("journal-article", "conference-paper")
+    ]
+
+    def order(seq: list[dict]) -> list[dict]:
+        return sorted(seq, key=lambda i: (not i["featured"], -int(i["year"] or 0), i["title"]))
+
+    indexed = 1
+    groups_html = ""
+    for key in ("journals", "conferences", "preprints"):
+        group = order(by_type[key])
+        if not group:
+            continue
+        rows, indexed = pub_list_rows(group, lang, labels, data["name"], start=indexed)
+        groups_html += f'\n  {h2(labels[key])}\n  <ul class="pubs pubs-full">\n{rows}\n  </ul>\n'
+
+    summary = pubs_page_summary(pub_stats(items), lang)
+    intro = {
+        "en": "This page lists all publications. The CV shows only the four selected first-author CCF-A papers.",
+        "zh": "本页为完整列表；简历上只列第一作者 CCF-A 的 4 篇代表性论文。",
+    }[lang]
+
+    return f"""<!DOCTYPE html>
+<!-- GENERATED by scripts/build_cv.py (pubs-{lang}) — 请勿手工编辑。
+     数据来源：content/publications/**（scripts/sync_publications.py 自动同步）
+     重新生成：python3 scripts/build_cv.py --pdf     生成日期 {generated} -->
+<html lang="{esc(cfg['html_lang'])}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{esc(data["name"])} — {esc(labels["pubs_doctitle"])}</title>
+<meta name="description" content="{esc(labels['pubs_doctitle'])} of {esc(data['name'])}.">
+<style>{CSS}</style>
+</head>
+<body data-lang="{esc(cfg['html_lang'])}">
+<div class="toolbar no-print">
+  <button onclick="window.print()">{esc(labels["print"])}</button>
+  <a href="{esc(cfg['pdf_href'])}">{esc(labels["download"])}</a>
+  <a href="{esc(cfg['cv_href'])}">{esc(labels["back_cv"])}</a>
+  <a href="{esc(cfg['alt_href'])}">{esc(labels["switch"])}</a>
+</div>
+<div class="sheet">
+  {page_header_html(cfg, data)}
+
+  {h2(labels["pubs_doctitle"])}
+  <div class="pubstats">{esc(summary)}</div>
+  <div class="group-note">{esc(intro)}</div>
+{groups_html}
+  <div class="foot">
+    <span>{esc(labels["updated"])} {esc(generated)}</span>
+    <span>{esc(data["name"])} · {esc(SITE)}/cv/publications/</span>
+  </div>
+</div>
+</body>
+</html>
+"""
+
+
 def build_html(lang: str) -> str:
     cfg = TARGETS[lang]
     labels = LABELS[lang]
@@ -669,6 +889,7 @@ def build_html(lang: str) -> str:
 <div class="toolbar no-print">
   <button onclick="window.print()">{esc(labels["print"])}</button>
   <a href="{esc(cfg['pdf_href'])}">{esc(labels["download"])}</a>
+  <a href="{esc(cfg['pubs_href'])}">{esc(labels["pubs_button"])}</a>
   <a href="{esc(cfg['alt_href'])}">{esc(labels["switch"])}</a>
 </div>
 <div class="sheet">
@@ -721,7 +942,7 @@ def build_html(lang: str) -> str:
 
   <div class="foot">
     <span>{esc(labels["updated"])} {esc(generated)}</span>
-    <span>{esc(labels["full_list"])}: {esc(SITE)}/publications</span>
+    <span>{esc(labels["full_list"])}: {esc(SITE)}/cv/publications/</span>
   </div>
 </div>
 </body>
@@ -738,8 +959,7 @@ def find_chromium() -> str | None:
     return None
 
 
-def build_pdf(lang: str) -> int:
-    cfg = TARGETS[lang]
+def build_pdf(cfg: dict) -> int:
     chromium = find_chromium()
     if not chromium:
         print("[warn] 未找到 chromium，跳过 PDF（可用浏览器打开 /cv/ 自行打印）", file=sys.stderr)
@@ -758,23 +978,36 @@ def build_pdf(lang: str) -> int:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="生成 A4 可打印简历（en / zh）")
+    parser = argparse.ArgumentParser(description="生成 A4 可打印简历 / 完整论文列表（en / zh）")
     parser.add_argument("--pdf", action="store_true", help="同时渲染 PDF")
     parser.add_argument("--lang", choices=("en", "zh", "both"), default="both", help="生成哪一版")
+    parser.add_argument(
+        "--only",
+        choices=("all", "cv", "pubs"),
+        default="all",
+        help="all=简历+论文列表；cv=只生成简历；pubs=只生成完整论文列表",
+    )
     args = parser.parse_args()
 
     if not PHOTO.exists():
-        print(f"[warn] 缺少证件照 {PHOTO.relative_to(ROOT)}，简历头部将不显示照片", file=sys.stderr)
+        print(f"[warn] 缺少证件照 {PHOTO.relative_to(ROOT)}，页面头部将不显示照片", file=sys.stderr)
 
     langs = ("en", "zh") if args.lang == "both" else (args.lang,)
+    keys: list[str] = []
+    if args.only in ("all", "cv"):
+        keys += list(langs)
+    if args.only in ("all", "pubs"):
+        keys += [f"pubs_{lang}" for lang in langs]
+
     rc = 0
-    for lang in langs:
-        cfg = TARGETS[lang]
+    for key in keys:
+        cfg = TARGETS[key]
         cfg["dir"].mkdir(parents=True, exist_ok=True)
-        cfg["html"].write_text(build_html(lang), encoding="utf-8")
+        html = build_publications_html(cfg["lang"]) if cfg["kind"] == "pubs" else build_html(key)
+        cfg["html"].write_text(html, encoding="utf-8")
         print(f"[html] {cfg['html'].relative_to(ROOT)}  {cfg['html'].stat().st_size / 1024:.0f} KB")
         if args.pdf:
-            rc |= build_pdf(lang)
+            rc |= build_pdf(cfg)
     return rc
 
 
