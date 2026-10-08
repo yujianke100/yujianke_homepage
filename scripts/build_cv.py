@@ -1135,22 +1135,13 @@ def build_gjgsu_html() -> str:
     )
     hl_html = (
         '<div class="hl"><ul>' + "".join(f"<li>{h}</li>" for h in highlights) + "</ul>"
-        f'<div class="sum">合计：符合筛选口径的代表论文 <b>{len(main)}</b> 篇（A+ 及以上、限署名角色）；'
+        f'<div class="sum">合计：代表性论文 <b>{len(main)}</b> 篇（A+ 及以上、署名角色限定）；'
         f'另 <b>{len(others)}</b> 篇其他论文、<b>{len(preprints)}</b> 篇预印本，均在本页完整列出；'
         f'近五年论文合计 <b>{len(main) + len(others) + len(preprints)}</b> 篇'
         f'（其中已发表 {len(main) + len(others)} 篇、预印本 {len(preprints)} 篇）；'
         f'总被引 <b>{citations}</b> 次。</div></div>'
     )
 
-    criteria = (
-        "论文筛选口径：① <b>2021 年及以后</b>发表（含在线发表）的期刊/会议论文；"
-        "② 刊物/会议的<b>推荐指数 A+ 及以上</b>（依据课题组《AI&amp;DM&amp;NLP&amp;BioMed 刊物推荐表 2024.09》；"
-        "推荐顺序 A+++ &gt; A++ &gt; A+ &gt; A &gt; A- &gt; B；CCF-A 类期刊与 CCF-A 类会议长文按表内口径计为 A+ 及以上）；"
-        "③ 署名角色为 <b>第一作者 / 共同第一作者 / 通讯作者 / 共同通讯作者 / 导师第一作者·本人第二作者</b> 之一"
-        "（导师指张颖教授、秦璐教授、王翰宸博士、王潇杨教授）。"
-        "预印本（arXiv）、<b>会议短文（Extended Abstract）</b>、以及一作非导师的合著论文均不计入主表，"
-        "仍在下方「其他论文」「预印本」中完整列出。"
-    )
     legend = (
         "标签：<span class=\"tag\">一作</span>第一作者　<span class=\"tag\">通讯作者</span>"
         "<span class=\"tag\">导师一作·学生二作</span><span class=\"tag\">共同一作 / 共同通讯</span>（人工确认后标注）　"
@@ -1211,7 +1202,6 @@ def build_gjgsu_html() -> str:
 
   <div class="page-break"></div>
   {h2(f"论文（代表 {len(main)} 篇 · 其他 {len(others)} 篇 · 预印本 {len(preprints)} 篇）")}
-  <div class="criteria">{criteria}</div>
   <div class="legend">{legend}</div>
   <ul class="pubs pubs-full">
 {core_rows_html(main, AUTHOR_LINE_NAME)}
