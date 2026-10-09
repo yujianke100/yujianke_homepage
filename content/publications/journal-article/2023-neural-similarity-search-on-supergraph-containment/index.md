@@ -17,7 +17,7 @@ publication:
   year: 2023
 peer_reviewed: true
 open_access: false
-cited_by: 11
+cited_by: 10
 featured: false
 awards:
   - name: "CCF-A"
