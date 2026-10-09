@@ -41,3 +41,17 @@ papers:
   "10.1007/s11280-025-01354-y":       # World Wide Web 2025 · RIDA（一作，刊物低于 A+）
     corresponding: ["Xijuan Liu"]
     manual_tags: []
+
+  # —— 以下为本人 2026-10-08 在《应聘申请表》中以 * 标注的通讯作者论文（OpenAlex 未标注，按本人确认登记）——
+  "10.1007/s41019-024-00278-3":        # DSE 2025 · IGFM
+    corresponding: []
+    manual_tags: ["通讯作者"]
+  "10.1007/978-981-95-3459-3_3":       # ADMA 2025 · AEFA
+    corresponding: []
+    manual_tags: ["通讯作者"]
+  "10.1007/978-981-96-8180-8_29":      # PAKDD 2025 · RPDN
+    corresponding: []
+    manual_tags: ["通讯作者"]
+  "10.1007/978-981-97-7238-4_6":       # APWeb-WAIM 2024 · SBGMN
+    corresponding: []
+    manual_tags: ["通讯作者"]
