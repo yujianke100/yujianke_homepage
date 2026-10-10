@@ -85,6 +85,7 @@ TARGETS: dict[str, dict] = {
     },
     # 工商入职专用：中文、按推荐表筛 A+ 及以上 + 署名角色限定
     "core_zh": {
+        "show_birth": True,
         "html": STATIC_CV / "zh" / "publications-core" / "index.html",
         "pdf": STATIC_CV / "zh" / "publications-core" / "Jianke-Yu-Core-Publications-zh.pdf",
         "dir": STATIC_CV / "zh" / "publications-core",
@@ -98,6 +99,7 @@ TARGETS: dict[str, dict] = {
     },
     # 工商入职专用：完整简历（中文简历主体 + 全部论文，含 highlight）
     "gjgsu_zh": {
+        "show_birth": True,
         "html": STATIC_CV / "zh" / "gjgsu" / "index.html",
         "pdf": STATIC_CV / "zh" / "gjgsu" / "Jianke-Yu-CV-gjgsu-zh.pdf",
         "dir": STATIC_CV / "zh" / "gjgsu",
@@ -512,6 +514,7 @@ def content_zh() -> dict:
             ],
             extra.get("github") or {},
         ),
+        "birth": clean(zh.get("birth")),
         "statement": clean(zh.get("research_statement")),
         "interests": clean(zh.get("interests")),
         "education": entries("education"),
@@ -838,6 +841,14 @@ def pub_list_rows(items: list[dict], lang: str, labels: dict, me_name: str, star
     return "\n".join(rows), start + len(items)
 
 
+def header_where(cfg: dict, data: dict) -> str:
+    """头部第三行：常居地；工商入职材料另附出生年月（cfg.show_birth）。"""
+    where = data.get("location") or ""
+    if cfg.get("show_birth") and data.get("birth"):
+        where = f"{where} · {data['birth']}生"
+    return where
+
+
 def page_header_html(cfg: dict, data: dict) -> str:
     """与简历完全一致的头部（照片 + 姓名 + 角色 + 联系方式）。"""
     contact = " · ".join(
@@ -851,11 +862,12 @@ def page_header_html(cfg: dict, data: dict) -> str:
         if PHOTO.exists()
         else ""
     )
+    where = header_where(cfg, data)
     return (
         "<header>\n    " + photo + '\n    <div class="who">\n'
         f'      <h1>{esc(data["name"])}<span class="alt">{esc(data["alt"])}</span></h1>\n'
         f'      <div class="role">{esc(data["role"])}</div>\n'
-        f'      <div class="where">{esc(data["location"])}</div>\n'
+        f'      <div class="where">{esc(where)}</div>\n'
         f'      <div class="contact">{contact}</div>\n'
         "    </div>\n  </header>"
     )
@@ -1213,6 +1225,7 @@ def build_gjgsu_html() -> str:
     main, others, preprints = prepare_core_items()
     stats = pub_stats(load_publications())
     generated = datetime.now().strftime("%Y-%m-%d")
+    where_line = header_where(cfg, data)
 
     def group_of(tag: str, grade: str | None = None) -> list[dict]:
         return [
@@ -1304,7 +1317,7 @@ def build_gjgsu_html() -> str:
     <div class="who">
       <h1>{esc(data["name"])}<span class="alt">{esc(data["alt"])}</span></h1>
       <div class="role">{esc(data["role"])}</div>
-      <div class="where">{esc(data["location"])}</div>
+      <div class="where">{esc(where_line)}</div>
       <div class="contact">{contact}</div>
     </div>
   </header>
@@ -1357,6 +1370,7 @@ def build_html(lang: str) -> str:
     labels = LABELS[lang]
     data = content_en() if lang == "en" else content_zh()
     generated = datetime.now().strftime("%d %b %Y") if lang == "en" else datetime.now().strftime("%Y-%m-%d")
+    where_line = header_where(cfg, data)
 
     # 联系方式：小标签 + 短标识，一行流动、· 分隔（标签是给打印稿看的）
     contact = " · ".join(
@@ -1411,7 +1425,7 @@ def build_html(lang: str) -> str:
     <div class="who">
       <h1>{esc(data["name"])}<span class="alt">{esc(data["alt"])}</span></h1>
       <div class="role">{esc(data["role"])}</div>
-      <div class="where">{esc(data["location"])}</div>
+      <div class="where">{esc(where_line)}</div>
       <div class="contact">{contact}</div>
     </div>
   </header>
