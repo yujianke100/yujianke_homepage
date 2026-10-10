@@ -627,6 +627,8 @@ body[data-lang="zh-CN"] .pubs-full .pauth, body[data-lang="zh-CN"] .pubs-full .p
 .pmeta .badge { margin-left: 0; margin-right: 4px; }
 .cite { color: var(--ink-3); font-size: 8.6pt; margin-left: 8px; }
 .plink { font-size: 8.6pt; color: var(--navy); border-bottom: .5px solid var(--rule); margin-left: 7px; }
+.doi { font-size: 9.1pt; color: var(--ink-3); }
+.doi a { color: var(--navy); text-decoration: none; border-bottom: .5px solid var(--rule); }
 .badge.feat { background: #fff; border-color: var(--navy); color: var(--navy); font-weight: 600; }
 .group-note { font-size: 9pt; color: var(--ink-3); margin: -2.5px 0 4.5px; }
 
@@ -734,7 +736,7 @@ def pubs_block(cfg: dict, lang: str) -> str:
         tail = f", {esc(item['year'])}" if item["year"] else ""
         rows.append(
             f'<li><span class="num">[{idx}]</span> {esc(item["title"])}. {venue}{tail}.'
-            f'{marks}{chips}</li>'
+            f'{doi_inline_html(item)}{marks}{chips}</li>'
         )
     return f'<div class="pubstats">{esc(summary)}</div>\n<ul class="pubs">\n' + "\n".join(rows) + "\n</ul>"
 
@@ -767,13 +769,43 @@ def pub_authors_html(item: dict, me_name: str) -> str:
     return ", ".join(out)
 
 
-def pub_links_html(item: dict) -> str:
+def doi_display(doi: str) -> str:
+    """DOI 打印用写法：ASCII 字母大写（DOI 大小写不敏感，期刊/会议论文端一律大写后缀，
+    如 10.1109/TKDE.2026.3689176），便于纸质件上辨识与检索。"""
+    return "".join(c.upper() if "a" <= c <= "z" else c for c in doi)
+
+
+def arxiv_id(raw: str) -> str:
+    """arXiv 号规范化：同步脚本有时把整个 DOI URL 写进来（https://doi.org/10.48550/arxiv.2407.18170），
+    这里只取编号本体（2407.18170），否则链接会拼成 arxiv.org/abs/https://doi.org/... 而失效。"""
+    s = (raw or "").strip()
+    if not s:
+        return ""
+    m = re.search(r"(\d{4}\.\d{4,5})(v\d+)?", s)
+    return m.group(1) if m else s
+
+
+def pub_links_html(item: dict, doi_inline: bool = False) -> str:
+    """链接。doi_inline=True 时 DOI 不进这一行（已印在标题/期刊那一行）。"""
     links = ""
-    if item.get("doi"):
+    if item.get("doi") and not doi_inline:
         links += f'<a class="plink" href="https://doi.org/{esc(item["doi"])}">DOI</a>'
-    if item.get("arxiv"):
-        links += f'<a class="plink" href="https://arxiv.org/abs/{esc(item["arxiv"])}">arXiv</a>'
+    arxiv = arxiv_id(item.get("arxiv") or "")
+    if arxiv:
+        if doi_inline:
+            links += f'<span class="doi">arXiv: <a href="https://arxiv.org/abs/{esc(arxiv)}">{esc(arxiv)}</a></span>'
+        else:
+            links += f'<a class="plink" href="https://arxiv.org/abs/{esc(arxiv)}">arXiv</a>'
     return links
+
+
+def doi_inline_html(item: dict) -> str:
+    """标题/期刊那一行末尾的 DOI 纯文本（纸质件可读，同时也是超链接）。"""
+    doi = (item.get("doi") or "").strip()
+    if not doi:
+        return ""
+    shown = esc(doi_display(doi))
+    return f' <span class="doi">DOI: <a href="https://doi.org/{esc(doi)}">{shown}</a></span>'
 
 
 def pub_list_rows(items: list[dict], lang: str, labels: dict, me_name: str, start: int = 1) -> tuple[str, int]:
@@ -794,9 +826,9 @@ def pub_list_rows(items: list[dict], lang: str, labels: dict, me_name: str, star
         tail = f", {esc(item['year'])}" if item["year"] else ""
         rows.append(
             f'<li><span class="num">[{idx}]</span> <span class="ptitle">{esc(item["title"])}</span>. '
-            f"{venue}{tail}."
+            f"{venue}{tail}.{doi_inline_html(item)}"
             f'<div class="pauth">{pub_authors_html(item, me_name)}</div>'
-            f'<div class="pmeta">{marks}{chips}{pub_links_html(item)}{cite}</div></li>'
+            f'<div class="pmeta">{marks}{chips}{pub_links_html(item, doi_inline=True)}{cite}</div></li>'
         )
     return "\n".join(rows), start + len(items)
 
@@ -950,6 +982,20 @@ def load_preprint_status() -> dict[str, str]:
 # 《应聘申请表》论文表「论文等级」栏一致）
 GRADE_LEVELS = ("A+++", "A+", "A")
 
+# 等级排序用（降序）：A+++ > A+ > A > 未分级
+GRADE_ORDER = {g: n for n, g in enumerate(GRADE_LEVELS)}
+
+# 代表性论文的排列顺序（本人指定）＝核心成果卡的顺序：
+# 一作 A+++ → 一作 A+ → 一作 A → 通讯 A+ → 通讯 A → 导师一作·学生二作 A+++
+ROLE_GRADE_ORDER = (
+    ("一作", "A+++"),
+    ("一作", "A+"),
+    ("一作", "A"),
+    ("通讯作者", "A+"),
+    ("通讯作者", "A"),
+    ("导师一作·学生二作", "A+++"),
+)
+
 
 def prepare_core_items() -> tuple[list[dict], list[dict], list[dict]]:
     """返回 (主表, 其他已发表, 预印本)。后两者每条都带 exclude_reason。
@@ -993,14 +1039,27 @@ def prepare_core_items() -> tuple[list[dict], list[dict], list[dict]]:
             reason = ""
         item["exclude_reason"] = reason
 
-    def order(seq: list[dict]) -> list[dict]:
-        return sorted(seq, key=lambda i: (not i["featured"], -i["year_int"], i["title"]))
+    def order_by_role_grade(seq: list[dict]) -> list[dict]:
+        """代表性论文排序：按「署名角色 × 学院等级」分组（与核心成果卡同序），组内按年份降序。"""
+        def key(i: dict):
+            for n, (tag, grade) in enumerate(ROLE_GRADE_ORDER):
+                if tag in (i.get("tags") or []) and (i.get("grade") or "") == grade:
+                    return (n, -i["year_int"], i["title"])
+            return (len(ROLE_GRADE_ORDER), -i["year_int"], i["title"])
+        return sorted(seq, key=key)
 
-    main = order([i for i in items if not i["exclude_reason"]])
-    others = order(
+    def order_by_grade(seq: list[dict]) -> list[dict]:
+        """其他论文排序：按学院等级降序（未分级者最后），同级按年份降序。"""
+        def key(i: dict):
+            g = str(i.get("grade") or "").strip()
+            return (GRADE_ORDER.get(g, len(GRADE_ORDER)), -i["year_int"], i["title"])
+        return sorted(seq, key=key)
+
+    main = order_by_role_grade([i for i in items if not i["exclude_reason"]])
+    others = order_by_grade(
         [i for i in items if i["exclude_reason"] and not i["is_preprint"] and not i["hidden"]]
     )
-    preprints = order(
+    preprints = order_by_grade(
         [i for i in items if i["exclude_reason"] and i["is_preprint"] and not i["hidden"]]
     )
     return main, others, preprints
@@ -1040,9 +1099,9 @@ def core_rows_html(items: list[dict], me_name: str, start: int = 1, with_note: b
             note = f'<div class="group-note">{" · ".join(parts)}</div>'
         rows.append(
             f'<li><span class="num">[{idx}]</span> <span class="ptitle">{esc(item["title"])}</span>。'
-            f"{venue}{tail}。"
+            f"{venue}{tail}。{doi_inline_html(item)}"
             f'<div class="pauth">{pub_authors_html(item, me_name)}</div>'
-            f'<div class="pmeta">{tags}{rate}{chips}{pub_links_html(item)}{cite}</div>{note}</li>'
+            f'<div class="pmeta">{tags}{rate}{chips}{pub_links_html(item, doi_inline=True)}{cite}</div>{note}</li>'
         )
     return "\n".join(rows)
 
@@ -1154,15 +1213,10 @@ def build_gjgsu_html() -> str:
 
     citations = stats["citations"]
 
-    # 按「署名角色 × 学院等级」出亮点（顺序与《师资评议汇总表》N 栏一致）
+    # 按「署名角色 × 学院等级」出亮点（顺序＝ROLE_GRADE_ORDER，与下表排列一致）
     TAG_CSS = {"一作": "tag", "通讯作者": "tag sec", "导师一作·学生二作": "tag sec"}
-    HIGHLIGHT_ROWS = [
-        ("一作", "A+++"), ("一作", "A+"), ("一作", "A"),
-        ("通讯作者", "A+"), ("通讯作者", "A"),
-        ("导师一作·学生二作", "A+++"),
-    ]
     highlights = []
-    for tag, grade in HIGHLIGHT_ROWS:
+    for tag, grade in ROLE_GRADE_ORDER:
         got = group_of(tag, grade)
         if not got:
             continue
