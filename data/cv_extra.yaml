@@ -50,9 +50,11 @@ invited_talks:
     date: "18 Apr 2026"
 
 academic_service:
-  - role: "Peer Reviewer"
-    org: "IEEE Transactions on Knowledge and Data Engineering (TKDE)"
-    period: "2025"
+  - role: "Journal Peer Reviewer"
+    org: "IEEE Transactions on Knowledge and Data Engineering (TKDE); Computers & Security; Information Processing & Management"
+    period: "2025–"
+  - role: "Conference Peer Reviewer"
+    org: "ADC, APWeb-WAIM and other international conferences"
   - role: "Platform Administrator"
     org: "Research Computing Platform, Prof. Ying Zhang & Prof. Xiaoyang Wang's Team, Zhejiang Gongshang University"
     period: "2021–"

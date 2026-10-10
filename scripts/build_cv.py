@@ -1027,11 +1027,11 @@ def core_rows_html(items: list[dict], me_name: str, start: int = 1, with_note: b
             tail += f"，{esc(item['preprint_status'])}"
         note = ""
         if with_note:
+            # CCF 等级不再在此处重复（徽章由 content/publications 的 awards 提供，
+            # 唯一数据源是 scripts/venues.yml；此处再写一遍会与徽章出现两个来源）
             parts: list[str] = []
             if item.get("grade"):
                 parts.append(f"等级：{item['grade']}")
-            if item.get("ccf"):
-                parts.append(item["ccf"])
             pos = item.get("position")
             role_txt = "、".join(item.get("tags") or []) or (f"第 {pos} 作者" if pos else "—")
             parts.append(f"署名：{role_txt}")

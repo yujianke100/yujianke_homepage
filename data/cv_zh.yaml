@@ -51,7 +51,7 @@ education:
   - title: 硕士，电子信息
     sub: 浙江工商大学
     when: 2020.09 – 2023.06
-    note: 导师：王潇杨教授。研究方向为图表征学习、欺诈检测与图相似性计算。
+    note: 导师：王潇杨教授。硕士学位论文《基于图神经网络的近似母图包含搜索算法》。研究方向为图表征学习、欺诈检测与图相似性计算。
   - title: 学士，电子信息工程
     sub: 浙江工商大学
     when: 2016.09 – 2020.06
@@ -84,9 +84,11 @@ invited_talks:
     when: 2026.04
 
 academic_service:
-  - title: 审稿人
-    sub: IEEE Transactions on Knowledge and Data Engineering (TKDE)
-    when: 2025
+  - title: 期刊审稿人
+    sub: IEEE Transactions on Knowledge and Data Engineering (TKDE)、Computers & Security、Information Processing & Management
+    when: 2025 –
+  - title: 会议审稿人
+    sub: ADC（Australasian Database Conference）、APWeb-WAIM 等国际会议
   - title: 平台管理员
     sub: 浙江工商大学 张颖教授、王潇杨教授课题组 · 服务器平台与数据基座
     when: 2021 –
@@ -110,7 +112,7 @@ skills:
   - key: 技术技能
     value: 图神经网络、Python / PyTorch、图数据库与查询处理、数据挖掘与欺诈检测
   - key: 科研与服务
-    value: 学术写作与论文发表、同行评议（IEEE TKDE）、教学与学生指导
+    value: 学术写作与论文发表、同行评议（IEEE TKDE、Computers & Security、Information Processing & Management）、教学与学生指导
 
 languages: 中文（母语）、英语（流利）
 

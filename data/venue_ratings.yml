@@ -16,6 +16,9 @@
 #   N 栏、《应聘申请表》论文表「论文等级」栏一致；2026-10-09 本人与导师商量后定稿）。
 #   A+++ / A+ / A 三档计入分档统计；未填＝学院未分级，不入主表。
 #   注意：该口径按「一作 / 通讯 / 导师一作·学生二作」署名角色计，一作非导师的合著不计入。
+#
+# ccf 字段：仅作记录。**CCF 徽章的唯一数据源是 scripts/venues.yml**（sync_publications.py 写入
+#   content/publications/** 的 awards），简历条目不再从本文件读 CCF，避免两处数据打架。
 
 journals:
   "IEEE Transactions on Knowledge and Data Engineering":
@@ -58,11 +61,11 @@ conferences:
     in_table: true
   "ACM SIGMOD Conference":
     rating: "A+"
-    zjgsu_grade: "A"
+    zjgsu_grade: "A+"
     ccf: "CCF-A"
     short: "SIGMOD"
     in_table: false
-    note: "推荐表「其它 CCF A 类会议(长文) = A+」；学院分级口径计 A 类（本人第 2 作者，不入分档统计）"
+    note: "推荐表「其它 CCF A 类会议(长文) = A+」；学院分级口径同计 A+（本人第 2 作者，署名角色不符，不入分档统计）"
   "IEEE International Conference on Data Engineering":
     rating: "A+"
     ccf: "CCF-A"
@@ -86,9 +89,11 @@ conferences:
     in_table: false
   "Australasian Database Conference":
     rating: null
-    ccf: "CCF-C"
+    zjgsu_grade: null
+    ccf: null          # 已核：CCF 官方目录（2022 版 PDF、现行分类页、2026 版 681 条）中均无 ADC，故不标 CCF 等级
     short: "ADC"
     in_table: false
+    note: "CCF 官方目录未收录（已核 2022 版原文与现行分类页）"
   "IEEE International Conference on High Performance Computing":
     rating: null
     ccf: "CCF-C"
