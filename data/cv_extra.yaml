@@ -58,7 +58,7 @@ academic_service:
   - role: "Platform Administrator"
     org: "Research Computing Platform, Prof. Ying Zhang & Prof. Xiaoyang Wang's Team, Zhejiang Gongshang University"
     period: "2021–"
-    note: "Taking charge of the group's GPU research computing platform since its first server was set up in 2021 (training and inference environments, accounts, LDAP-based access, resource scheduling, monitoring)."
+    note: "Responsible for the group's research computing platform and graph data infrastructure: deployment and scheduling of GPU clusters and multi-GPU LLM inference services, research accounts and compute resource management, monitoring and alerting; development and maintenance of a self-built graph data storage and exploration base and a self-built cluster management platform (both closed-source, in internal use)."
 
 preprint_status:
   "A Hypergraph-Based Framework for Exploratory Business Intelligence": "ACM SIGMOD 2027 在投（under review）"

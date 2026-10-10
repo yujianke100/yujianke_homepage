@@ -125,7 +125,7 @@ LABELS: dict[str, dict[str, str]] = {
         "publications": "Selected Publications (first-author CCF-A)",
         "talks": "Invited Talks",
         "honors": "Honors & Awards",
-        "scholarships": "Scholarships & Funding",
+        "scholarships": "Scholarships",
         "activities": "Academic Activities & Service",
         "service": "Academic Service",
         "teaching": "Teaching",
@@ -157,7 +157,7 @@ LABELS: dict[str, dict[str, str]] = {
         "publications": "代表性论文（第一作者 CCF-A）",
         "talks": "学术报告",
         "honors": "荣誉与奖励",
-        "scholarships": "奖学金与资助",
+        "scholarships": "奖学金",
         "activities": "学术活动",
         "service": "学术服务",
         "teaching": "教学工作",
@@ -653,6 +653,11 @@ body[data-lang="zh-CN"] .pubs-full .pauth, body[data-lang="zh-CN"] .pubs-full .p
 .hl li:last-child { margin-bottom: 0; }
 .hl b { color: var(--navy); }
 .hl .tag { font-size: 7.6pt; }
+.hl .lead {
+  font-size: 11.4pt; font-weight: 600; line-height: 1.5; color: var(--ink);
+  padding-bottom: 4.5px; margin-bottom: 5px; border-bottom: 1px solid #c8d5e3;
+}
+.hl .lead b { color: var(--navy); font-weight: 800; }
 .hl .sum { font-size: 9.6pt; color: var(--ink-2); margin-top: 4px; }
 
 /* ---------- toolbar (screen only) ---------- */
@@ -985,6 +990,9 @@ GRADE_LEVELS = ("A+++", "A+", "A")
 # 等级排序用（降序）：A+++ > A+ > A > 未分级
 GRADE_ORDER = {g: n for n, g in enumerate(GRADE_LEVELS)}
 
+# CCF 等级排序用（A > B > C > 未收录），用于学院等级相同的条目之间的次序
+CCF_ORDER = {"A": 0, "B": 1, "C": 2}
+
 # 代表性论文的排列顺序（本人指定）＝核心成果卡的顺序：
 # 一作 A+++ → 一作 A+ → 一作 A → 通讯 A+ → 通讯 A → 导师一作·学生二作 A+++
 ROLE_GRADE_ORDER = (
@@ -1039,20 +1047,30 @@ def prepare_core_items() -> tuple[list[dict], list[dict], list[dict]]:
             reason = ""
         item["exclude_reason"] = reason
 
+    def ccf_rank(item: dict) -> int:
+        """CCF 等级次序（A < B < C < 未收录）。学院等级未填时用它作为补充排序依据——
+        合成数据来自 scripts/venues.yml（经 content/publications 的 awards 写入）。"""
+        for badge in item.get("badges") or []:
+            if badge.startswith("CCF-") and badge[4:] in CCF_ORDER:
+                return CCF_ORDER[badge[4:]]
+        return len(CCF_ORDER)
+
     def order_by_role_grade(seq: list[dict]) -> list[dict]:
-        """代表性论文排序：按「署名角色 × 学院等级」分组（与核心成果卡同序），组内按年份降序。"""
+        """代表性论文排序：按「署名角色 × 学院等级」分组（与核心成果卡同序），
+        组内先按 CCF 等级、再按年份降序。"""
         def key(i: dict):
             for n, (tag, grade) in enumerate(ROLE_GRADE_ORDER):
                 if tag in (i.get("tags") or []) and (i.get("grade") or "") == grade:
-                    return (n, -i["year_int"], i["title"])
-            return (len(ROLE_GRADE_ORDER), -i["year_int"], i["title"])
+                    return (n, ccf_rank(i), -i["year_int"], i["title"])
+            return (len(ROLE_GRADE_ORDER), ccf_rank(i), -i["year_int"], i["title"])
         return sorted(seq, key=key)
 
     def order_by_grade(seq: list[dict]) -> list[dict]:
-        """其他论文排序：按学院等级降序（未分级者最后），同级按年份降序。"""
+        """其他论文排序：学院等级降序 → CCF 等级降序 → 年份降序。
+        两条等级都未收录的（IFGNN／ADC、FLINS-ISKE）因此排在最后。"""
         def key(i: dict):
             g = str(i.get("grade") or "").strip()
-            return (GRADE_ORDER.get(g, len(GRADE_ORDER)), -i["year_int"], i["title"])
+            return (GRADE_ORDER.get(g, len(GRADE_ORDER)), ccf_rank(i), -i["year_int"], i["title"])
         return sorted(seq, key=key)
 
     main = order_by_role_grade([i for i in items if not i["exclude_reason"]])
@@ -1232,12 +1250,14 @@ def build_gjgsu_html() -> str:
     n_grade = {
         g: sum(1 for i in main if (i.get("grade") or "") == g) for g in GRADE_LEVELS
     }
+    # 合计行放最前（先给总量与分档，再列各署名角色的细目）
     hl_html = (
-        '<div class="hl"><ul>' + "".join(f"<li>{h}</li>" for h in highlights) + "</ul>"
-        f'<div class="sum">合计：A+++ 类 <b>{n_grade["A+++"]}</b> 篇、A+ 类 <b>{n_grade["A+"]}</b> 篇、'
-        f'A 类 <b>{n_grade["A"]}</b> 篇（代表性论文共 <b>{len(main)}</b> 篇，见下表）；'
-        f'论文合计 <b>{len(main) + len(others)}</b> 篇（其他 <b>{len(others)}</b> 篇见下方）；'
-        f'总被引 <b>{citations}</b> 次。</div></div>'
+        '<div class="hl">'
+        f'<div class="lead">近五年发表论文 <b>{len(main) + len(others)}</b> 篇'
+        f'（A 档及以上 <b>{len(main)}</b> 篇），其中 A+++ 类 <b>{n_grade["A+++"]}</b> 篇、'
+        f'A+ 类 <b>{n_grade["A+"]}</b> 篇、A 类 <b>{n_grade["A"]}</b> 篇；'
+        f'总被引 <b>{citations}</b> 次。</div>'
+        '<ul>' + "".join(f"<li>{h}</li>" for h in highlights) + "</ul></div>"
     )
 
     legend = (
