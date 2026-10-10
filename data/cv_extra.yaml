@@ -56,7 +56,7 @@ academic_service:
   - role: "Conference Peer Reviewer"
     org: "ADC, APWeb-WAIM and other international conferences"
   - role: "Platform Administrator"
-    org: "Research Computing Platform, Prof. Ying Zhang & Prof. Xiaoyang Wang's Team, Zhejiang Gongshang University"
+    org: "Research Computing Platform, Prof. Ying Zhang's Team, Zhejiang Gongshang University"
     period: "2021–"
     note: "Responsible for the group's research computing platform and graph data infrastructure: deployment and scheduling of GPU clusters and multi-GPU LLM inference services, research accounts and compute resource management, monitoring and alerting; development and maintenance of a self-built graph data storage and exploration base and a self-built cluster management platform (both closed-source, in internal use)."
 
