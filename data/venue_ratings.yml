@@ -10,44 +10,59 @@
 #     - 未列出但是 CCF-A 会议且为长文 → A+（记为 "A+（其它 CCF A 类会议长文）"）
 #     - CCF-B/C 且表内未列出 → 低于 A+，记为 "未收录"，不计入
 #
-# rating: null / 字符串。凡是低于 A+ 的论文，在「工商入职版」列表里不进主表。
+# rating: null / 字符串。课题组推荐表口径（学术简历页用）。
+#
+# zjgsu_grade：浙工商学院《论文分级口径》的填写值（工商入职材料用，与《师资评议汇总表》
+#   N 栏、《应聘申请表》论文表「论文等级」栏一致；2026-10-09 本人与导师商量后定稿）。
+#   A+++ / A+ / A 三档计入分档统计；未填＝学院未分级，不入主表。
+#   注意：该口径按「一作 / 通讯 / 导师一作·学生二作」署名角色计，一作非导师的合著不计入。
 
 journals:
   "IEEE Transactions on Knowledge and Data Engineering":
     rating: "A+++"
+    zjgsu_grade: "A+++"
+    short: "IEEE TKDE"
     ccf: "CCF-A"
     cas: "中科院 2 区"
     in_table: true
   "Information Sciences":
     rating: "A+"
+    short: "Information Sciences"
+    zjgsu_grade: "A+"
     ccf: "CCF-B"
     cas: "中科院 1 区"
     in_table: true
   "World Wide Web":
     rating: null
+    short: "World Wide Web"
+    zjgsu_grade: "A"
     ccf: "CCF-B"
     cas: "中科院 4 区"
     in_table: false
-    note: "表内未收录（CCF-B），低于 A+"
+    note: "推荐表未收录（CCF-B）；学院分级口径计 A 类"
   "Data Science and Engineering":
     rating: null
+    short: "Data Science and Engineering"
+    zjgsu_grade: "A"
     ccf: "CCF-B"
     cas: "中科院 1 区"
     in_table: false
-    note: "表内未收录，低于 A+"
+    note: "推荐表未收录；学院分级口径计 A 类"
 
 conferences:
   "ACM SIGKDD Conference on Knowledge Discovery and Data Mining":
     rating: "A+"
+    zjgsu_grade: "A+"
     ccf: "CCF-A"
-    short: "KDD"
+    short: "ACM SIGKDD"
     in_table: true
   "ACM SIGMOD Conference":
     rating: "A+"
+    zjgsu_grade: "A"
     ccf: "CCF-A"
     short: "SIGMOD"
     in_table: false
-    note: "表内「其它 CCF A 类会议(长文) = A+」"
+    note: "推荐表「其它 CCF A 类会议(长文) = A+」；学院分级口径计 A 类（本人第 2 作者，不入分档统计）"
   "IEEE International Conference on Data Engineering":
     rating: "A+"
     ccf: "CCF-A"

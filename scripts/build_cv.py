@@ -946,21 +946,33 @@ def load_preprint_status() -> dict[str, str]:
     return {str(k): str(v) for k, v in (extra.get("preprint_status") or {}).items()}
 
 
+# 学院《论文分级口径》中计入分档统计的三档（工商材料统一口径，与《师资评议汇总表》N 栏、
+# 《应聘申请表》论文表「论文等级」栏一致）
+GRADE_LEVELS = ("A+++", "A+", "A")
+
+
 def prepare_core_items() -> tuple[list[dict], list[dict], list[dict]]:
-    """返回 (主表, 其他已发表, 预印本)。后两者每条都带 exclude_reason。"""
+    """返回 (主表, 其他已发表, 预印本)。后两者每条都带 exclude_reason。
+
+    等级口径＝data/venue_ratings.yml 的 zjgsu_grade（浙工商学院《论文分级口径》）；
+    署名角色口径＝第一作者 / 通讯作者 / 导师第一作者·本人第二作者。
+    未写明学院等级、或署名角色不符（如一作非导师的合著）的论文不进主表。
+    """
     ratings = load_venue_ratings()
     roles = load_roles()
     preprint_status = load_preprint_status()
     items = load_publications()
     for item in items:
         meta = rate_of(item["venue"], ratings)
-        item["rating"] = meta.get("rating")
+        item["rating"] = meta.get("rating")        # 课题组推荐表口径（学术页用）
+        item["grade"] = meta.get("zjgsu_grade")    # 学院分级口径（工商页用）
+        item["short"] = meta.get("short") or item["venue"]
         item["ccf"] = meta.get("ccf")
         item["rate_note"] = meta.get("note") or ""
         item["tags"] = role_tags(item, roles)
         item["year_int"] = int(item["year"] or 0)
         item["long_paper"] = "extended abstract" not in item["title"].lower()
-        item["a_plus"] = str(item["rating"] or "").startswith("A+")
+        item["a_plus"] = str(item["grade"] or "").strip() in GRADE_LEVELS
         # 预印本（arXiv 等）单独成段，不与已发表论文混排
         item["is_preprint"] = item["folder"] not in ("journal-article", "conference-paper")
         item["preprint_status"] = preprint_status.get(item["title"], "")
@@ -972,7 +984,7 @@ def prepare_core_items() -> tuple[list[dict], list[dict], list[dict]]:
         elif item["year_int"] < CORE_MIN_YEAR:
             reason = f"{CORE_MIN_YEAR} 年前发表"
         elif not item["a_plus"]:
-            reason = "推荐指数未达 A+（推荐表未收录）"
+            reason = "学院分级口径未计入 A 档"
         elif not item["long_paper"]:
             reason = "会议短文（Extended Abstract）不计入"
         elif not item["tags"]:
@@ -1002,7 +1014,7 @@ def core_rows_html(items: list[dict], me_name: str, start: int = 1, with_note: b
         tags = ""
         if not with_note:  # 「其他（未计入）」段落不再显示署名标签，避免看起来像计入了
             tags = "".join(f'<span class="tag">{esc(t)}</span>' for t in item.get("tags") or [])
-        rate = f'<span class="badge ccf">{esc(item["rating"])}</span>' if item.get("rating") else ""
+        rate = f'<span class="badge ccf">{esc(item["grade"])}</span>' if item.get("grade") else ""
         chips = ""
         for badge in sorted(item["badges"], key=lambda b: (not b.startswith("CCF-"), b)):
             css = "badge ccf" if badge.startswith("CCF-") else "badge"
@@ -1015,11 +1027,14 @@ def core_rows_html(items: list[dict], me_name: str, start: int = 1, with_note: b
             tail += f"，{esc(item['preprint_status'])}"
         note = ""
         if with_note:
-            rate_txt = item.get("rating") or "推荐表未收录"
-            ccf_txt = f"，{item['ccf']}" if item.get("ccf") else ""
+            parts: list[str] = []
+            if item.get("grade"):
+                parts.append(f"等级：{item['grade']}")
+            if item.get("ccf"):
+                parts.append(item["ccf"])
             pos = item.get("position")
             role_txt = "、".join(item.get("tags") or []) or (f"第 {pos} 作者" if pos else "—")
-            parts = [f"推荐指数：{rate_txt}{ccf_txt}", f"署名：{role_txt}"]
+            parts.append(f"署名：{role_txt}")
             if show_reason and item.get("exclude_reason"):
                 parts.append(f"未计入原因：{item['exclude_reason']}")
             note = f'<div class="group-note">{" · ".join(parts)}</div>'
@@ -1052,8 +1067,8 @@ def build_core_html() -> str:
 
     criteria = (
         "筛选口径：① <b>2021 年及以后</b>发表（含在线发表）的期刊/会议论文；"
-        "② 刊物/会议的<b>推荐指数 A+ 及以上</b>（依据课题组《AI&amp;DM&amp;NLP&amp;BioMed 刊物推荐表 2024.09》；"
-        "推荐顺序 A+++ &gt; A++ &gt; A+ &gt; A &gt; A- &gt; B；CCF-A 类期刊与 CCF-A 类会议长文按表内口径计为 A+ 及以上）；"
+        "② 论文等级属<b>学院《论文分级口径》的 A+++ / A+ / A 三档</b>"
+        "（与《师资评议汇总表》论文发表栏填写值一致）；"
         "③ 署名角色为 <b>第一作者 / 共同第一作者 / 通讯作者 / 共同通讯作者 / 导师第一作者·本人第二作者</b> 之一"
         "（导师指张颖教授、秦璐教授、王翰宸博士、王潇杨教授）。"
         "预印本（arXiv）、<b>会议短文（Extended Abstract）</b>、以及一作非导师的合著论文均不计入。"
@@ -1061,7 +1076,8 @@ def build_core_html() -> str:
     legend = (
         "标签：<span class=\"tag\">一作</span>第一作者　<span class=\"tag\">通讯作者</span>"
         "<span class=\"tag\">导师一作·学生二作</span><span class=\"tag\">共同一作 / 共同通讯</span>（人工确认后标注）　"
-        "│ 等级：<span class=\"badge ccf\">A+++</span><span class=\"badge ccf\">A+</span> = 推荐表推荐指数；"
+        "│ 等级：<span class=\"badge ccf\">A+++</span><span class=\"badge ccf\">A+</span>"
+        "<span class=\"badge ccf\">A</span> = 学院论文分级口径；"
         "CCF-A/B/C = CCF 推荐目录；中科院 N 区 / JCR Qn = 期刊分区。"
     )
 
@@ -1087,7 +1103,7 @@ def build_core_html() -> str:
 <div class="sheet">
   {page_header_html(cfg, data)}
 
-  {h2("代表性论文（A+ 及以上 · 限定署名角色）")}
+  {h2("代表性论文（A 档及以上 · 限定署名角色）")}
   <div class="criteria">{criteria}</div>
   <div class="legend">{legend}</div>
   <ul class="pubs pubs-full">
@@ -1121,49 +1137,58 @@ def build_gjgsu_html() -> str:
     stats = pub_stats(load_publications())
     generated = datetime.now().strftime("%Y-%m-%d")
 
-    def n_of(tag: str, rating: str | None = None) -> int:
-        return sum(
-            1 for i in main
-            if tag in (i.get("tags") or []) and (rating is None or i.get("rating") == rating)
-        )
+    def group_of(tag: str, grade: str | None = None) -> list[dict]:
+        return [
+            i for i in main
+            if tag in (i.get("tags") or [])
+            and (grade is None or (i.get("grade") or "") == grade)
+        ]
 
-    n_fa_ppp = n_of("一作", "A+++")
-    n_fa_p = n_of("一作", "A+")
-    n_corr = n_of("通讯作者")
-    n_sup = n_of("导师一作·学生二作")
+    def venue_list(items: list[dict]) -> str:
+        seen: list[str] = []
+        for i in items:
+            label = i.get("short") or i["venue"]
+            if label and label not in seen:
+                seen.append(label)
+        return "、".join(seen)
+
     citations = stats["citations"]
 
+    # 按「署名角色 × 学院等级」出亮点（顺序与《师资评议汇总表》N 栏一致）
+    TAG_CSS = {"一作": "tag", "通讯作者": "tag sec", "导师一作·学生二作": "tag sec"}
+    HIGHLIGHT_ROWS = [
+        ("一作", "A+++"), ("一作", "A+"), ("一作", "A"),
+        ("通讯作者", "A+"), ("通讯作者", "A"),
+        ("导师一作·学生二作", "A+++"),
+    ]
     highlights = []
-    if n_fa_ppp:
+    for tag, grade in HIGHLIGHT_ROWS:
+        got = group_of(tag, grade)
+        if not got:
+            continue
+        label = "第一作者" if tag == "一作" else tag
         highlights.append(
-            f'<span class="tag">一作</span><b>第一作者 A+++ 类论文 {n_fa_ppp} 篇</b>（IEEE TKDE）'
-        )
-    if n_fa_p:
-        highlights.append(
-            f'<span class="tag">一作</span><b>第一作者 CCF-A 类会议论文 {n_fa_p} 篇</b>（ACM SIGKDD 2023）'
-        )
-    if n_corr:
-        highlights.append(
-            f'<span class="tag sec">通讯作者</span><b>通讯作者 A+ 类论文 {n_corr} 篇</b>'
-            "（Information Sciences）"
-        )
-    if n_sup:
-        highlights.append(
-            f'<span class="tag sec">导师一作·学生二作</span><b>A+++ 类论文 {n_sup} 篇</b>（IEEE TKDE）'
+            f'<span class="{TAG_CSS[tag]}">{esc(tag)}</span>'
+            f"<b>{label} {grade} 类论文 {len(got)} 篇</b>（{esc(venue_list(got))}）"
         )
     highlights.append(
         '<span class="tag">工程</span><b>组内科研计算平台负责人（2021 至今）</b>'
         "：GPU 集群建设与运维、多卡 LLM 推理服务与调度、自研集群管理平台与图数据基座"
     )
+    n_grade = {
+        g: sum(1 for i in main if (i.get("grade") or "") == g) for g in GRADE_LEVELS
+    }
     hl_html = (
         '<div class="hl"><ul>' + "".join(f"<li>{h}</li>" for h in highlights) + "</ul>"
-        f'<div class="sum">合计：代表性论文 <b>{len(main)}</b> 篇，其他论文 <b>{len(others)}</b> 篇，'
-        f'均在下方完整列出；论文合计 <b>{len(main) + len(others)}</b> 篇；'
+        f'<div class="sum">合计：A+++ 类 <b>{n_grade["A+++"]}</b> 篇、A+ 类 <b>{n_grade["A+"]}</b> 篇、'
+        f'A 类 <b>{n_grade["A"]}</b> 篇（代表性论文共 <b>{len(main)}</b> 篇，见下表）；'
+        f'论文合计 <b>{len(main) + len(others)}</b> 篇（其他 <b>{len(others)}</b> 篇见下方）；'
         f'总被引 <b>{citations}</b> 次。</div></div>'
     )
 
     legend = (
-        "等级：<span class=\"badge ccf\">A+++</span><span class=\"badge ccf\">A+</span> = 推荐表推荐指数；"
+        "等级：<span class=\"badge ccf\">A+++</span><span class=\"badge ccf\">A+</span>"
+        "<span class=\"badge ccf\">A</span> = 学院论文分级口径（与《师资评议汇总表》一致）；"
         "CCF-A/B/C = CCF 推荐目录；中科院 N 区 / JCR Qn = 期刊分区。"
     )
 
