@@ -371,6 +371,18 @@ def pub_stats(items: list[dict]) -> dict:
     }
 
 
+def citation_value():
+    """汇总被引数：优先 data/cv_extra.yaml 的 citations.value（Google Scholar），否则 None（回退 OpenAlex 相加）。"""
+    extra = load_yaml(ROOT / "data" / "cv_extra.yaml") or {}
+    c = extra.get("citations") or {}
+    return c.get("value")
+
+
+def citation_source() -> str:
+    extra = load_yaml(ROOT / "data" / "cv_extra.yaml") or {}
+    return str((extra.get("citations") or {}).get("source") or "").strip()
+
+
 def pub_summary(stats: dict, lang: str) -> str:
     """数量统计行：只讲 CCF 与 SCI 论文数量（用户要求）。"""
     if lang == "zh":
@@ -378,13 +390,15 @@ def pub_summary(stats: dict, lang: str) -> str:
             f"总体：同行评审论文 {stats['total']} 篇（SCI 期刊 {stats['journals']} 篇，"
             f"其中 JCR Q1 {stats['q1']} 篇；会议 {stats['conferences']} 篇）—— "
             f"CCF-A {stats['ccf_a']} 篇、CCF-B {stats['ccf_b']} 篇、CCF-C {stats['ccf_c']} 篇；"
-            f"第一作者 {stats['first_author']} 篇；总被引 {stats['citations']} 次。"
+            f"第一作者 {stats['first_author']} 篇；总被引 {citation_value() or stats['citations']} 次"
+            + (f"（{citation_source()}）" if citation_value() and citation_source() else "") + "。"
         )
     return (
         f"Overall: {stats['total']} peer-reviewed papers ({stats['journals']} SCI journal papers, "
         f"{stats['q1']} in JCR Q1; {stats['conferences']} conference papers) — "
         f"{stats['ccf_a']} CCF-A, {stats['ccf_b']} CCF-B, {stats['ccf_c']} CCF-C; "
-        f"{stats['first_author']} as first author; {stats['citations']} citations."
+        f"{stats['first_author']} as first author; {citation_value() or stats['citations']} citations"
+        + (f" ({citation_source()})" if citation_value() and citation_source() else "") + "."
     )
 
 
@@ -757,13 +771,17 @@ def pubs_page_summary(stats: dict, lang: str) -> str:
         return (
             f"同行评审论文 {peer} 篇（SCI 期刊 {stats['journals']} 篇，其中 JCR Q1 {stats['q1']} 篇；"
             f"会议 {stats['conferences']} 篇）{extra} —— CCF-A {stats['ccf_a']} 篇、CCF-B {stats['ccf_b']} 篇、"
-            f"CCF-C {stats['ccf_c']} 篇；第一作者 {stats['first_author']} 篇；总被引 {stats['citations']} 次。"
+            f"CCF-C {stats['ccf_c']} 篇；第一作者 {stats['first_author']} 篇；总被引 "
+            f"{citation_value() or stats['citations']} 次"
+            + (f"（{citation_source()}）" if citation_value() and citation_source() else "") + "。"
         )
     extra = f", plus {stats['others']} preprint" if stats["others"] else ""
     return (
         f"{peer} peer-reviewed papers ({stats['journals']} SCI journal papers, {stats['q1']} in JCR Q1; "
         f"{stats['conferences']} conference papers){extra} — {stats['ccf_a']} CCF-A, {stats['ccf_b']} CCF-B, "
-        f"{stats['ccf_c']} CCF-C; {stats['first_author']} first-author; {stats['citations']} citations."
+        f"{stats['ccf_c']} CCF-C; {stats['first_author']} first-author; "
+        f"{citation_value() or stats['citations']} citations"
+        + (f" ({citation_source()})" if citation_value() and citation_source() else "") + "."
     )
 
 
@@ -1242,7 +1260,8 @@ def build_gjgsu_html() -> str:
                 seen.append(label)
         return "、".join(seen)
 
-    citations = stats["citations"]
+    citations = citation_value() or stats["citations"]
+    cit_src = citation_source()
 
     # 按「署名角色 × 学院等级」出亮点（顺序＝ROLE_GRADE_ORDER，与下表排列一致）
     TAG_CSS = {"一作": "tag", "通讯作者": "tag sec", "导师一作·学生二作": "tag sec"}
@@ -1269,14 +1288,14 @@ def build_gjgsu_html() -> str:
         f'<div class="lead">近五年发表论文 <b>{len(main) + len(others)}</b> 篇'
         f'（A 档及以上 <b>{len(main)}</b> 篇），其中 A+++ 类 <b>{n_grade["A+++"]}</b> 篇、'
         f'A+ 类 <b>{n_grade["A+"]}</b> 篇、A 类 <b>{n_grade["A"]}</b> 篇；'
-        f'总被引 <b>{citations}</b> 次。</div>'
+        f'总被引 <b>{citations}</b> 次' + (f"（{cit_src}）" if cit_src else "") + '。</div>'
         '<ul>' + "".join(f"<li>{h}</li>" for h in highlights) + "</ul></div>"
     )
 
     legend = (
         "等级：<span class=\"badge ccf\">A+++</span><span class=\"badge ccf\">A+</span>"
         "<span class=\"badge ccf\">A</span> = 学院论文分级口径（与《师资评议汇总表》一致）；"
-        "CCF-A/B/C = CCF 推荐目录；中科院 N 区 / JCR Qn = 期刊分区。"
+        "CCF-A/B/C = CCF 推荐目录；中科院 N 区 / JCR Qn = 期刊分区；逐篇引用数来自 OpenAlex。"
     )
 
     acts = list(data["talks"]) + list(data["service"]) + [

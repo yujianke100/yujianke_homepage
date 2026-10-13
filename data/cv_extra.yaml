@@ -44,6 +44,15 @@ research_statement: |
   malware detection, graph similarity computation), and learning-based methods that
   accelerate database and data-mining algorithms.
 
+# 汇总被引数（学术简历与工商材料的「总被引」使用此值；逐篇引用数仍来自 OpenAlex 自动同步）
+# 2026-10-12：Google Scholar 个人页显示 Citations 228（All）/ 228（Since 2021）、h-index 6、i10-index 6；
+# OpenAlex 逐篇相加为 122（覆盖范围更窄：不含预印本/学位论文/非索引来源，且不合并同一文献的多个版本）。
+citations:
+  value: 228
+  source: "Google Scholar"
+  as_of: "2026-10"
+  note: "逐篇引用数来自 OpenAlex 自动同步，汇总数为 Google Scholar 口径"
+
 invited_talks:
   - title: "Scalable Big Data Computation"
     event: "Seminar, School of Data Science, The Chinese University of Hong Kong, Shenzhen"
