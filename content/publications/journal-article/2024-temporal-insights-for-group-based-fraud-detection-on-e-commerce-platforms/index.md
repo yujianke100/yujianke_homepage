@@ -20,7 +20,7 @@ publication:
   year: 2024
 peer_reviewed: true
 open_access: false
-cited_by: 13
+cited_by: 14
 featured: true
 awards:
   - name: "CCF-A"
