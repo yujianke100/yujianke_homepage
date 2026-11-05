@@ -17,7 +17,7 @@ publication:
   year: 2025
 peer_reviewed: true
 open_access: true
-cited_by: 12
+cited_by: 14
 featured: false
 awards:
   - name: "CCF-A"
