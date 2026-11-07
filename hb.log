@@ -1,0 +1,10 @@
+run=42324344319 event=workflow_run sha=80f2d3c9353ffa527d3c41c226a67e1f2743fcdb
+secret_present=yes
+time=2026-11-07 01:29:42 UTC
+--- ssh test ---
+SSH_OK
+homepage
+/home/homepage
+ls: cannot access '/home/homepage/deploy_preview.sh': No such file or directory
+ssh_exit=2
+scp_exit=0
