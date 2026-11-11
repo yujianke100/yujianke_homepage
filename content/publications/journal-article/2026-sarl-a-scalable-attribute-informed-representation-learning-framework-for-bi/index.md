@@ -10,8 +10,8 @@ authors:
   - "Ying Zhang"
   - "Xijuan Liu"
 author_position: 1
-date: 2026-01-01
-publishDate: 2026-01-01
+date: 2026-09-17
+publishDate: 2026-09-17
 publication_types: ["article-journal"]
 publication:
   name: "IEEE Transactions on Knowledge and Data Engineering"
