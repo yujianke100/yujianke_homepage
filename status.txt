@@ -1,0 +1,13 @@
+run_id=43543429675
+event=workflow_run
+sha=c6ff36f3f4cff7e4ff97dfbd3020ae570b7efe23
+target=live
+job_status=success
+time=2026-11-14 01:58:58 UTC
+TARGET=live
+--- 步骤结果 ---
+target_resolve=success
+build=success
+pagefind=success
+pack=success
+deploy=success
