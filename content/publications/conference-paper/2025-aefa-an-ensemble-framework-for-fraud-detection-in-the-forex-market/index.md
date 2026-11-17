@@ -21,7 +21,7 @@ publication:
   year: 2025
 peer_reviewed: true
 open_access: false
-cited_by: 1
+cited_by: 3
 featured: false
 awards:
   - name: "CCF-C"

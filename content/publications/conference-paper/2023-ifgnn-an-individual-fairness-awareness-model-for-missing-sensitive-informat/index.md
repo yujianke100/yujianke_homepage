@@ -17,7 +17,7 @@ publication:
   year: 2023
 peer_reviewed: true
 open_access: true
-cited_by: 0
+cited_by: 1
 featured: false
 hugoblox:
   ids:
