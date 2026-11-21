@@ -9,8 +9,8 @@ authors:
   - "Yang-Wai Chow"
   - "Ying Zhang"
 author_position: 2
-date: 2024-08-27
-publishDate: 2024-08-27
+date: 2024-08-28
+publishDate: 2024-08-28
 publication_types: ["paper-conference"]
 publication:
   name: "Asia Pacific Web Conference (APWeb-WAIM)"

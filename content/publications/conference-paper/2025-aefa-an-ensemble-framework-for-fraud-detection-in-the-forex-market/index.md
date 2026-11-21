@@ -13,8 +13,8 @@ authors:
   - "John A. Shepherd"
   - "Wenjie Zhang"
 author_position: 2
-date: 2025-10-18
-publishDate: 2025-10-18
+date: 2025-10-19
+publishDate: 2025-10-19
 publication_types: ["paper-conference"]
 publication:
   name: "International Conference on Advanced Data Mining and Applications"

@@ -9,8 +9,8 @@ authors:
   - "Xiaoyang Wang"
   - "Wenjie Zhang"
 author_position: 3
-date: 2023-11-06
-publishDate: 2023-11-06
+date: 2023-11-07
+publishDate: 2023-11-07
 publication_types: ["paper-conference"]
 publication:
   name: "Australasian Database Conference"

@@ -9,8 +9,8 @@ authors:
   - "Ying Zhang"
   - "X D Liu"
 author_position: 4
-date: 2026-07-08
-publishDate: 2026-07-08
+date: 2026-07-09
+publishDate: 2026-07-09
 publication_types: ["paper-conference"]
 publication:
   name: "FLINS-ISKE"

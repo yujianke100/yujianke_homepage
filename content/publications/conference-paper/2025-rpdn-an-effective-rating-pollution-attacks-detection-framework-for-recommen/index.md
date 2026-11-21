@@ -9,8 +9,8 @@ authors:
   - "Xiaoyang Wang"
   - "Chen Chen"
 author_position: 2
-date: 2025-06-19
-publishDate: 2025-06-19
+date: 2025-06-20
+publishDate: 2025-06-20
 publication_types: ["paper-conference"]
 publication:
   name: "Pacific-Asia Conference on Knowledge Discovery and Data Mining"
