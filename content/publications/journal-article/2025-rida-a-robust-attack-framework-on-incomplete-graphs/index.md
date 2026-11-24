@@ -31,7 +31,7 @@ awards:
 hugoblox:
   ids:
     doi: 10.1007/s11280-025-01354-y
-    arxiv: https://doi.org/10.48550/arxiv.2407.18170
+    arxiv: 2407.18170
 projects: []
 slides: ""
 ---
